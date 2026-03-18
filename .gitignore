@@ -25,3 +25,5 @@ replay_pid*
 
 # Appunti
 APPUNTI.md
+*.docx
+.vscode
