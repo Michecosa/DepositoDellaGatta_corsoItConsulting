@@ -22,19 +22,40 @@ public class ProvaFunzioni {
     return a + b + c;
   }
 
+  // 3. RICORSIONE (Fattoriale)
+  static int fattoriale(int n) {
+    if (n <= 1) return 1;
+    return n * fattoriale(n - 1);
+  }
+
+  // 4. PASSAGGIO PER VALORE (Primitivi: il valore originale non cambia)
+  static void modifica(int x) {
+    x = x + 10;
+  }
+
+  // 5. PASSAGGIO DI RIFERIMENTO (Array: la modifica è visibile all'esterno)
+  static void modifica(int[] arr) {
+    arr[0] = 99; // Questa modifica influisce sul'array originale
+  }
+
   public static void main(String[] args) {
     saluta(); 
     
-    // Chiama il metodo somma(int, int)
-    int r1 = somma(5, 10);
-    System.out.println("Somma interi: " + r1);
+    // Test Somme
+    System.out.println("Somma interi: " + somma(5, 10));
+    System.out.println("Somma decimali: " + somma(5.5, 2.3));
     
-    // Chiama il metodo somma(double, double)
-    double r2 = somma(5.5, 2.3);
-    System.out.println("Somma decimali: " + r2);
-    
-    // Chiama il metodo somma(int, int, int)
-    int r3 = somma(10, 20, 30);
-    System.out.println("Somma di tre numeri: " + r3);
+    // Test Ricorsione
+    System.out.println("Fattoriale di 5: " + fattoriale(5));
+
+    // Test Passaggio per Valore (Variabile semplice)
+    int num = 5;
+    modifica(num);
+    System.out.println("Variabile dopo modifica(int): " + num); // Resta 5
+
+    // Test Passaggio di Riferimento (Array)
+    int[] numeri = {1, 2, 3};
+    modifica(numeri); // Chiama l'overload che accetta int[]
+    System.out.println("Array dopo modifica(int[]): " + numeri[0]); // Diventa 99
   }
 }
