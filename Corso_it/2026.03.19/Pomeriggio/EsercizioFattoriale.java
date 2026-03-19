@@ -1,6 +1,9 @@
+import java.util.Scanner;
+
 public class EsercizioFattoriale {
   // 1. Metodo che accetta un intero e calcola il fattoriale
   static long calcolaFattoriale(int n) {
+    if (n < 0) return 0; // Gestione per numeri negativi
     long risultato = 1;
     // Ciclo per moltiplicare i numeri da 1 a n
     for (int i = 1; i <= n; i++) {
@@ -15,14 +18,23 @@ public class EsercizioFattoriale {
   }
 
   public static void main(String[] args) {
-    // Test con un numero intero 
-    int numero = 5;
-    long fattoriale = calcolaFattoriale(numero); // calcola 5! => 1*2*3*4*5
-    System.out.println("\nIl fattoriale di " + numero + " è: " + fattoriale);
+    // Creo l'oggetto Scanner
+    Scanner tastiera = new Scanner(System.in);
 
-    // Test con una stringa
-    calcolaFattoriale("cinque");
+    System.out.print("Inserisci un numero intero per calcolare il fattoriale: ");
+    
+    // Controllo se l'input dell'utente è effettivamente un numero
+    if (tastiera.hasNextInt()) {
+      int numero = tastiera.nextInt();
+      long fattoriale = calcolaFattoriale(numero);
+      System.out.println("Il fattoriale di " + numero + " è: " + fattoriale);
+    } else {
+      // Se non è un numero, leggo la stringa errata e uso l'overload
+      String inputErrato = tastiera.next();
+      calcolaFattoriale(inputErrato);
+    }
 
-    System.out.println();
+    // Chiudo lo scanner
+    tastiera.close();
   }
 }
