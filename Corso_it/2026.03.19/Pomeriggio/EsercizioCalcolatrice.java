@@ -34,7 +34,12 @@ public class EsercizioCalcolatrice {
     double n2 = scanner.nextDouble();
 
     System.out.println("\nOPERAZIONI:");
-    System.out.println("1 - Somma\n2 - Sottrazione\n3 - Moltiplicazione\n4 - Divisione\n5 - Esci\n");
+    System.out.println("1 - Somma");
+    System.out.println("2 - Sottrazione");
+    System.out.println("3 - Moltiplicazione");
+    System.out.println("4 - Divisione");
+    System.out.println("5 - Potenza (base ^ esponente)");
+    System.out.println("6 - Esci");
     System.out.println("-----------------------\n");
     System.out.print("Numero dell'operazione da eseguire: ");
     
