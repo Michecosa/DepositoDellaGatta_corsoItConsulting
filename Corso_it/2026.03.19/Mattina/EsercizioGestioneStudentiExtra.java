@@ -9,7 +9,7 @@ public class EsercizioGestioneStudentiExtra {
     ArrayList<Float> voti = new ArrayList<>();
     
     // Creo l'ArrayList "contenitore" che ospiterà le tre liste precedenti
-    ArrayList<ArrayList> database = new ArrayList<>();
+    ArrayList<ArrayList<?>> database = new ArrayList<>();
     
     // Collego le liste al database
     database.add(studenti); // Indice 0 del database
