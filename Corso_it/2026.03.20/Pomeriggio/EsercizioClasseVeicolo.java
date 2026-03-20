@@ -6,9 +6,8 @@ class Veicolo {
   String modello;
   int anno;
   double prezzo;
-  boolean inserito = false; // Serve per il controllo al punto 2
+  boolean inserito = false;
 
-  // Metodo d'istanza per visualizzare i dati
   public void visualizzaDati() {
     if (!inserito) {
       System.out.println("Nessun veicolo inserito");
@@ -17,16 +16,15 @@ class Veicolo {
     }
   }
 
-  // Metodo per verificare l'età del veicolo
   public void verificaEta() {
     if (!inserito) {
       System.out.println("Nessun veicolo inserito");
       return;
     }
-    int anniAttuali = 2026 - anno; // Calcolato sull'anno attuale
+    int anniAttuali = 2026 - anno;
     if (anniAttuali < 5) {
       System.out.println("Il veicolo è... NUOVO");
-  } else if (anniAttuali <= 15) {
+    } else if (anniAttuali <= 15) {
       System.out.println("Il veicolo è... USATO");
     } else {
       System.out.println("Il veicolo è... VECCHIO");
@@ -46,10 +44,44 @@ public class EsercizioClasseVeicolo {
     System.out.print("\nScegli un'opzione: ");
   }
 
-  
+  public static void inserisciDati(Veicolo v, Scanner in) {
+    System.out.print("Marca: ");
+    v.marca = in.nextLine();
+    System.out.print("Modello: ");
+    v.modello = in.nextLine();
+
+    do {
+      System.out.print("Anno (> 1900): ");
+      v.anno = in.nextInt();
+    } while (v.anno <= 1900 || v.anno > 2026);
+
+    do {
+      System.out.print("Prezzo (> 0): ");
+      v.prezzo = in.nextDouble();
+    } while (v.prezzo <= 0);
+    
+    v.inserito = true;
+    System.out.println("Dati salvati con successo!");
+  }
+
+  public static void modificaPrezzo(Veicolo v, Scanner in) {
+    if (v.inserito) {
+      System.out.print("Inserisci nuovo prezzo: ");
+      double nuovoPrezzo = in.nextDouble();
+      if (nuovoPrezzo > 0) {
+        v.prezzo = nuovoPrezzo;
+        System.out.println("Prezzo aggiornato");
+      } else {
+        System.out.println("Errore: prezzo non valido");
+      }
+    } else {
+      System.out.println("Nessun veicolo inserito");
+    }
+  }
+
   public static void main(String[] args) {
     Scanner in = new Scanner(System.in);
-    Veicolo mioVeicolo = new Veicolo(); // Creazione dell'oggetto
+    Veicolo mioVeicolo = new Veicolo();
     int scelta;
 
     do {
@@ -60,25 +92,7 @@ public class EsercizioClasseVeicolo {
 
       switch (scelta) {
         case 1:
-          System.out.print("Marca: ");
-          mioVeicolo.marca = in.nextLine();
-          System.out.print("Modello: ");
-          mioVeicolo.modello = in.nextLine();
-          
-          // Controllo Anno
-          do {
-            System.out.print("Anno (> 1900): ");
-            mioVeicolo.anno = in.nextInt();
-          } while (mioVeicolo.anno <= 1900 || mioVeicolo.anno > 2026);
-          
-          // Controllo Prezzo
-          do {
-            System.out.print("Prezzo (> 0): ");
-            mioVeicolo.prezzo = in.nextDouble();
-          } while (mioVeicolo.prezzo <= 0);
-          
-          mioVeicolo.inserito = true;
-          System.out.println("Dati salvati con successo!");
+          inserisciDati(mioVeicolo, in);
           break;
 
         case 2:
@@ -86,18 +100,7 @@ public class EsercizioClasseVeicolo {
           break;
 
         case 3:
-          if (mioVeicolo.inserito) {
-            System.out.print("Inserisci nuovo prezzo: ");
-            double nuovoPrezzo = in.nextDouble();
-            if (nuovoPrezzo > 0) {
-              mioVeicolo.prezzo = nuovoPrezzo;
-              System.out.println("Prezzo aggiornato");
-            } else {
-              System.out.println("Errore: prezzo non valido");
-            }
-          } else {
-            System.out.println("Nessun veicolo inserito");
-          }
+          modificaPrezzo(mioVeicolo, in);
           break;
 
         case 4:
@@ -111,10 +114,10 @@ public class EsercizioClasseVeicolo {
 
         default:
           System.out.println("Opzione non valida");
-        }
+      }
     } while (scelta != 5);
     
-    // Chiudo delle risorse
+    // Chiudo la risorsa
     in.close();
   }
 }
