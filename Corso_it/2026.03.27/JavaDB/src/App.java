@@ -1,40 +1,47 @@
 import java.sql.*;
 
 public class App {
-    public static void main(String[] args) {
-        String url = "jdbc:mysql://localhost:3306/sakila";
+    public static void main(String[] args) throws Exception {
+        String host = "localhost";
+        String port = "3306";
+        String url = "jdbc:mysql://" + host + ":" + port + "/sakila";
         String user = "root";
-        String password = "root";
+        String psw = "root";
 
-        try {
+        String query = "SELECT * FROM actor LIMIT ?";
+        int nRow = 5;
 
-            Connection conn = DriverManager.getConnection(url, user, password);
-            System.out.println("Connesso al database!\n");
-            // conn.close();
-            // System.out.println("Configurazione JDBC ok!");
+        try (Connection conn = DriverManager.getConnection(url, user, psw);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            // 1. Creo lo Statement
-            Statement stmt = conn.createStatement();
+            pstmt.setInt(1, nRow);
+            ResultSet result = pstmt.executeQuery();
 
-            // 2. Eseguo la query
-            String sql = "SELECT actor_id, first_name, last_name FROM actor LIMIT 10";
-            ResultSet rs = stmt.executeQuery(sql);
+            ResultSetMetaData meta = result.getMetaData();
+            int numColumns = meta.getColumnCount();
 
-
-            // 3. Itero sui risultati
-            while (rs.next()) {
-                int id = rs.getInt("actor_id");
-                String nome = rs.getString("first_name");
-                String cognome = rs.getString("last_name");
-
-                System.out.println(id + ": " + nome + " " + cognome);
+            // 1. STAMPA INTESTAZIONE
+            System.out.println("-".repeat(numColumns * 25)); // Linea decorativa
+            for (int i = 1; i <= numColumns; i++) {
+                // %-20s significa: stringa, allineata a sinistra, larga 20 caratteri
+                System.out.printf("%-20s | ", meta.getColumnName(i).toUpperCase());
             }
+            System.out.println("\n" + "-".repeat(numColumns * 25));
 
-            conn.close();
+            // 2. STAMPA DATI
+            while (result.next()) {
+                for (int i = 1; i <= numColumns; i++) {
+                    Object val = result.getObject(i);
+                    // Gestisco il null graficamente e usco lo stesso spazio dell'header
+                    String printVal = (val != null) ? val.toString() : "NULL";
+                    System.out.printf("%-20s | ", printVal);
+                }
+                System.out.println();
+            }
+            System.out.println("-".repeat(numColumns * 25));
 
         } catch (SQLException e) {
-
-            e.printStackTrace();
+            System.err.println("Errore di connessione: " + e.getMessage());
         }
     }
 }
