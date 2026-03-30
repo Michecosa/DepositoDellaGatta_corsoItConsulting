@@ -79,7 +79,7 @@ class Library {
       if (b.title.equalsIgnoreCase(title)) {
         if (b.isAvailable) {
           b.isAvailable = false;
-          b.loanDate = LocalDate.now(); // Registra la data attuale
+          b.loanDate = LocalDate.now();
           user.borrowedBooks.add(b);
           System.out.println("Prestito effettuato con successo il "+b.loanDate);
           return;
@@ -119,7 +119,7 @@ public class EsercizioBiblioteca {
     Scanner input = new Scanner(System.in);
     Library biblio = new Library();
     
-    // Popolamento iniziale utenti
+    biblio.users.add(new User("admin"));
     biblio.users.add(new User("Miche"));
     biblio.users.add(new User("Mario"));
 
@@ -142,7 +142,7 @@ public class EsercizioBiblioteca {
       boolean continua = true;
       while (continua) {
         System.out.println("\n--- BIBLIOTECA (Utente: " + utenteAttivo.name + ") ---");
-        System.out.println("1. Aggiungi nuovo libro");
+        System.out.println("1. Aggiungi nuovo libro (solo admin)");
         System.out.println("2. Visualizza tutti i libri");
         System.out.println("3. Cerca un libro");
         System.out.println("4. Prendi in prestito");
@@ -155,11 +155,16 @@ public class EsercizioBiblioteca {
 
         switch (scelta) {
           case 1:
-            System.out.print("Titolo: "); 
-            String t = input.nextLine();
-            System.out.print("Autore: "); 
-            String a = input.nextLine();
-            biblio.addBook(new Book(t, a));
+            // Controllo admin
+            if (utenteAttivo.name.equalsIgnoreCase("admin")) {
+              System.out.print("Titolo: "); 
+              String t = input.nextLine();
+              System.out.print("Autore: "); 
+              String a = input.nextLine();
+              biblio.addBook(new Book(t, a));
+            } else {
+              System.out.println("Accesso negato: Solo l'amministratore può aggiungere libri");
+            }
             break;
           
           case 2: 
