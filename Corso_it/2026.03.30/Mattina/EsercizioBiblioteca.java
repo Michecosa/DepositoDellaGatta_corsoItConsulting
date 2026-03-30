@@ -118,6 +118,12 @@ public class EsercizioBiblioteca {
   public static void main(String[] args) {
     Scanner input = new Scanner(System.in);
     Library biblio = new Library();
+
+    // Libri presenti di default
+    biblio.addBook(new Book("Il Signore degli Anelli", "J.R.R. Tolkien"));
+    biblio.addBook(new Book("1984", "George Orwell"));
+    biblio.addBook(new Book("Il Piccolo Principe", "Antoine de Saint-Exupéry"));
+    biblio.addBook(new Book("Harry Potter e la Pietra Filosofale", "J.K. Rowling"));
     
     biblio.users.add(new User("admin"));
     biblio.users.add(new User("Miche"));
