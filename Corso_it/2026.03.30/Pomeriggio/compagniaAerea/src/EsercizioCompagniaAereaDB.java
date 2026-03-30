@@ -2,6 +2,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+// Classe che modella l'oggetto Aereo con i suoi attributi privati
 class Aereo {
   private String modello, codice;
   private int numeroPosti;
@@ -12,10 +13,12 @@ class Aereo {
     setNumeroPosti(numeroPosti);
   }
 
+  // Metodi Getter per l'accesso ai dati privati
   public String getModello() { return modello; }
   public String getCodice() { return codice; }
   public int getNumeroPosti() { return numeroPosti; }
 
+  // Metodi Setter con logica di validazione (Incapsulamento)
   public void setModello(String modello) { this.modello = modello; }
   public void setCodice(String codice) { this.codice = codice; }
   public void setNumeroPosti(int numeroPosti) {
@@ -24,6 +27,7 @@ class Aereo {
   }
 }
 
+// Classe che modella il Pilota
 class Pilota {
   private String nome, numeroBrevetto;
   private int oreVolo;
@@ -46,6 +50,7 @@ class Pilota {
   }
 }
 
+// Classe CompagniaAerea che aggrega aerei e piloti (Composizione)
 class CompagniaAerea {
   private String nome;
   private ArrayList<Aereo> flotta = new ArrayList<>();
@@ -57,6 +62,7 @@ class CompagniaAerea {
   public void aggiungiAereo(Aereo aereo) { flotta.add(aereo); }
   public void aggiungiPilota(Pilota pilota) { piloti.add(pilota); }
 
+  // Metodo per stampare il riepilogo completo dell'oggetto caricato
   public void stampaInfo() {
     System.out.println("\n--- COMPAGNIA: " + nome.toUpperCase() + " ---");
     System.out.println("FLOTTA (" + flotta.size() + " aerei)");
@@ -78,11 +84,13 @@ class CompagniaAerea {
 }
 
 public class EsercizioCompagniaAereaDB {
+  // Costanti per la connessione JDBC
   static final String URL = "jdbc:mysql://localhost:3306/gestione_flotta";
   static final String USER = "root";
   static final String PASS = "root";
 
   public static void main(String[] args) {
+    // Try-with-resources per gestire automaticamente la chiusura di connessione e scanner
     try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
       Scanner sc = new Scanner(System.in)) {
       System.out.println("Connesso al database");
@@ -90,6 +98,7 @@ public class EsercizioCompagniaAereaDB {
     } catch (SQLException e) { e.printStackTrace(); }
   }
 
+  // Gestione del menu testuale
   static void menu(Connection conn, Scanner sc) throws SQLException {
     int scelta;
     do {
@@ -115,6 +124,7 @@ public class EsercizioCompagniaAereaDB {
     } while (scelta != 0);
   }
 
+  // CASE 1: Inserimento nuova compagnia e recupero dell'ID autoincrementale
   static void creaCompagnia(Connection conn, Scanner sc) throws SQLException {
     System.out.print("Nome compagnia: ");
     String nome = sc.nextLine().trim();
@@ -132,6 +142,7 @@ public class EsercizioCompagniaAereaDB {
     }
   }
 
+  // CASE 2: Inserimento aereo con riferimento alla Foreign Key della compagnia
   static void aggiungiAereo(Connection conn, Scanner sc) throws SQLException {
     elencaCompagnie(conn);
 
@@ -162,6 +173,7 @@ public class EsercizioCompagniaAereaDB {
     }
   }
 
+  // CASE 3: Inserimento pilota collegato al database
   static void aggiungiPilota(Connection conn, Scanner sc) throws SQLException {
     elencaCompagnie(conn);
     System.out.print("ID compagnia: "); 
@@ -191,6 +203,7 @@ public class EsercizioCompagniaAereaDB {
     }
   }
 
+  // CASE 4: Caricamento dati dal DB e creazione degli oggetti Java per la stampa
   static void visualizzaCompagnia(Connection conn, Scanner sc) throws SQLException {
     elencaCompagnie(conn);
     System.out.print("ID compagnia: ");
@@ -199,6 +212,7 @@ public class EsercizioCompagniaAereaDB {
     else System.out.println("Compagnia non trovata");
   }
 
+  // CASE 5: Semplice query SELECT per mostrare le compagnie disponibili
   static void elencaCompagnie(Connection conn) throws SQLException {
     String sql = "SELECT id, nome FROM compagnie";
     try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
@@ -206,6 +220,7 @@ public class EsercizioCompagniaAereaDB {
     }
   }
 
+  // Funzione core: Trasforma le righe delle tabelle SQL in oggetti Java (O.R.M. manuale)
   static CompagniaAerea caricaCompagniaCompleta(Connection conn, int id) throws SQLException {
     CompagniaAerea compagnia = null;
     String sqlC = "SELECT nome FROM compagnie WHERE id = ?";
@@ -215,12 +230,14 @@ public class EsercizioCompagniaAereaDB {
       if (rs.next()) compagnia = new CompagniaAerea(rs.getString("nome"));
     }
     if (compagnia != null) {
+      // Caricamento della lista aerei
       String sqlA = "SELECT modello, numero_posti, codice FROM aerei WHERE id_compagnia = ?";
       try (PreparedStatement ps = conn.prepareStatement(sqlA)) {
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
         while (rs.next()) compagnia.aggiungiAereo(new Aereo(rs.getString("modello"), rs.getInt("numero_posti"), rs.getString("codice")));
       }
+      // Caricamento della lista piloti
       String sqlP = "SELECT nome, numero_brevetto, ore_volo FROM piloti WHERE id_compagnia = ?";
       try (PreparedStatement ps = conn.prepareStatement(sqlP)) {
         ps.setInt(1, id);
@@ -231,6 +248,7 @@ public class EsercizioCompagniaAereaDB {
     return compagnia;
   }
 
+  // Funzione di validazione per controllare l'integrità referenziale prima degli inserimenti
   static boolean compagniaEsiste(Connection conn, int id) throws SQLException {
     String sql = "SELECT id FROM compagnie WHERE id = ?";
     try (PreparedStatement ps = conn.prepareStatement(sql)) {
