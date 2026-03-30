@@ -43,6 +43,8 @@ class User {
 
 class Library {
   ArrayList<Book> books = new ArrayList<>();
+  // Lista degli utenti registrati nel sistema
+  ArrayList<User> users = new ArrayList<>();
 
   void addBook(Book book) {
     books.add(book);
@@ -116,60 +118,80 @@ public class EsercizioBiblioteca {
   public static void main(String[] args) {
     Scanner input = new Scanner(System.in);
     Library biblio = new Library();
-    User utente = new User("Miche");
-    boolean continua = true;
+    
+    // Popolamento iniziale utenti
+    biblio.users.add(new User("Miche"));
+    biblio.users.add(new User("Mario"));
 
-    while (continua) {
-      System.out.println("\n--- BIBLIOTECA ---");
-      System.out.println("1. Aggiungi nuovo libro");
-      System.out.println("2. Visualizza tutti i libri");
-      System.out.println("3. Cerca un libro");
-      System.out.println("4. Prendi in prestito");
-      System.out.println("5. Restituisci libro");
-      System.out.println("6. Visualizza i miei prestiti");
-      System.out.println("0. Esci");
-      System.out.print("Scelta: ");
-      int scelta = input.nextInt();
-      input.nextLine();
+    System.out.print("Inserisci il tuo nome utente per accedere: ");
+    String nomeLogin = input.nextLine();
+    User utenteAttivo = null;
 
-      switch (scelta) {
-        case 1:
-          System.out.print("Titolo: ");
-          String t = input.nextLine();
-          System.out.print("Autore: ");
-          String a = input.nextLine();
-          biblio.addBook(new Book(t, a));
-          break;
-        
-        case 2: 
-          biblio.displayBooks(); 
-          break;
-        
-        case 3:
-          System.out.print("Inserisci titolo o autore: ");
-          biblio.searchBook(input.nextLine());
-          break;
-        
-        case 4:
-          System.out.print("Titolo del libro da prendere: ");
-          biblio.borrowBook(input.nextLine(), utente);
-          break;
-        
-        case 5:
-          System.out.print("Titolo del libro da restituire: ");
-          biblio.returnBook(input.nextLine(), utente);
-          break;
-        
-        case 6: 
-          utente.displayBorrowedBooks(); 
-          break;
-        
-        case 0: 
-          continua = false; 
-          break;
-        
-        default: 
-          System.out.println("Scelta non valida");
+    // Controllo accesso
+    for (User u : biblio.users) {
+      if (u.name.equalsIgnoreCase(nomeLogin)) {
+        utenteAttivo = u;
+        break;
+      }
+    }
+
+    if (utenteAttivo == null) {
+      System.out.println("Utente non trovato. Accesso negato");
+    } else {
+      System.out.println("Ciao " + utenteAttivo.name);
+      boolean continua = true;
+      while (continua) {
+        System.out.println("\n--- BIBLIOTECA (Utente: " + utenteAttivo.name + ") ---");
+        System.out.println("1. Aggiungi nuovo libro");
+        System.out.println("2. Visualizza tutti i libri");
+        System.out.println("3. Cerca un libro");
+        System.out.println("4. Prendi in prestito");
+        System.out.println("5. Restituisci libro");
+        System.out.println("6. Visualizza i miei prestiti");
+        System.out.println("0. Esci");
+        System.out.print("Scelta: ");
+        int scelta = input.nextInt();
+        input.nextLine();
+
+        switch (scelta) {
+          case 1:
+            System.out.print("Titolo: "); 
+            String t = input.nextLine();
+            System.out.print("Autore: "); 
+            String a = input.nextLine();
+            biblio.addBook(new Book(t, a));
+            break;
+          
+          case 2: 
+            biblio.displayBooks(); 
+            break;
+          
+          case 3:
+            System.out.print("Cerca: ");
+            biblio.searchBook(input.nextLine());
+            break;
+          
+          case 4:
+            System.out.print("Titolo da prendere: ");
+            biblio.borrowBook(input.nextLine(), utenteAttivo);
+            break;
+          
+          case 5:
+            System.out.print("Titolo da restituire: ");
+            biblio.returnBook(input.nextLine(), utenteAttivo);
+            break;
+          
+          case 6: 
+            utenteAttivo.displayBorrowedBooks(); 
+            break;
+          
+          case 0: 
+            continua = false; 
+            break;
+          
+          default: 
+            System.out.println("Scelta non valida");
+        }
       }
     }
     input.close();
