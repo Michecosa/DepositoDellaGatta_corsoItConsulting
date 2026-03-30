@@ -10,6 +10,12 @@ class Auto {
         this.marca = marca; // 'this' serve a distinguere il campo della classe dal parametro
         this.anno = anno;
     }
+
+    // Metodo toString (implicito dell'oggetto) 
+    @Override // Buona pratica
+    public String toString() {
+        return marca+" - "+anno;
+    }
 }
 
 public class ProvaOggettiArrayList {
@@ -29,7 +35,8 @@ public class ProvaOggettiArrayList {
             /* Accediamo ai campi (marca e anno) dell'oggetto corrente 
                usando l'operatore punto (.) e stampiamo i valori.
             */
-            System.out.println(auto.marca + " - " + auto.anno);
+            // System.out.println(auto.marca + " - " + auto.anno);
+            System.out.println(auto);
         }
     }
 }
