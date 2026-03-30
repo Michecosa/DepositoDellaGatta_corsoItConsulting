@@ -37,9 +37,15 @@ public class EsercizioBankAccount {
   public static void main(String[] args) {
     Scanner input = new Scanner(System.in);
     
-    // Creo l'ArrayList di conti +popolamento iniziale
+    // Due ArrayList separate: una per i nomi (String) e una per i conti (BankAccount)
+    ArrayList<String> credenziali = new ArrayList<>();
     ArrayList<BankAccount> conti = new ArrayList<>();
-    conti.add(new BankAccount("Miche", 0.0)); // accurato
+
+    // Popolamento in parallelo
+    credenziali.add("Miche");
+    conti.add(new BankAccount("Miche", 0.0));
+
+    credenziali.add("Mario");
     conti.add(new BankAccount("Mario", 500.0));
 
     System.out.print("Inserisci il nome del titolare per accedere al conto: ");
@@ -47,9 +53,10 @@ public class EsercizioBankAccount {
     
     BankAccount accountAttivo = null;
 
-    for (BankAccount b : conti) {
-      if (b.accountHolderName.equalsIgnoreCase(nomeAccesso)) {
-        accountAttivo = b; // Trovato: salvo il riferimento
+    // Ricerca basata sull'indice della lista credenziali
+    for (int i = 0; i < credenziali.size(); i++) {
+      if (credenziali.get(i).equalsIgnoreCase(nomeAccesso)) {
+        accountAttivo = conti.get(i); // Prelevo il conto corrispondente alla posizione del nome
         break;
       }
     }
