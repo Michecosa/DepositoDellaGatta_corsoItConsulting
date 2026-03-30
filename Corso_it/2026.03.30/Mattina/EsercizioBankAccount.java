@@ -99,7 +99,7 @@ public class EsercizioBankAccount {
         }
       }
 
-    input.close();
+      input.close();
     }
   }
 }
