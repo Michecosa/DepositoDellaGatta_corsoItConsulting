@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 class Auto {
   String targa;
@@ -19,24 +20,56 @@ class Officina {
   }
 
   void stampaElenco() {
-    System.out.println("\n--- AUTO IN OFFICINA ---");
-    for (Auto a : listaAuto) {
-      System.out.println(a.modello+" - Targa: "+a.targa);
+    if (listaAuto.isEmpty()) {
+      System.out.println("L'officina è vuota");
+    } else {
+      System.out.println("\n--- AUTO IN OFFICINA ---");
+      for (Auto a : listaAuto) {
+        System.out.println(a.modello+" - Targa: "+a.targa);
+      }
     }
   }
-
 }
 
 public class EsercizioAutoofficina {
   public static void main(String[] args) {
+    Scanner input = new Scanner(System.in);
     Officina miaOfficina = new Officina();
+    boolean continua = true;
 
-    Auto auto1 = new Auto("AA111BB", "Fiat Panda");
-    Auto auto2 = new Auto("BB222CC", "Porsche 718 Cayman");
+    while (continua) {
+      System.out.println("\n--- MENU OFFICINA ---");
+      System.out.println("1 - Aggiungi auto");
+      System.out.println("2 - Visualizza elenco");
+      System.out.println("3 - Esci");
+      System.out.print("Scelta: ");
+      
+      int scelta = input.nextInt();
+      input.nextLine();
 
-    miaOfficina.aggiungiAuto(auto1);
-    miaOfficina.aggiungiAuto(auto2);
+      switch (scelta) {
+        case 1:
+          System.out.print("Inserisci modello: ");
+          String mod = input.nextLine();
+          System.out.print("Inserisci targa: ");
+          String targ = input.nextLine();
+          
+          miaOfficina.aggiungiAuto(new Auto(targ, mod));
+          break;
 
-    miaOfficina.stampaElenco();
+        case 2:
+          miaOfficina.stampaElenco();
+          break;
+
+        case 3:
+          continua = false;
+          System.out.println("Chiusura officina...");
+          break;
+
+        default:
+          System.out.println("Scelta non valida");
+      }
+    }
+    input.close();
   }
 }
