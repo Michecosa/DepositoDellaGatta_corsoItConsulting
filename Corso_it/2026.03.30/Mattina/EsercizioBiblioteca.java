@@ -1,10 +1,13 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.LocalDate; // per gestire le date
+import java.time.temporal.ChronoUnit; // per calcolare i giorni tra date
 
 class Book {
   String title;
   String author;
   boolean isAvailable;
+  LocalDate loanDate; // per tracciare la scadenza
 
   Book(String title, String author) {
     this.title = title;
@@ -29,10 +32,10 @@ class User {
   void displayBorrowedBooks() {
     System.out.println("\nLibri in prestito a "+name+":");
     if (borrowedBooks.isEmpty()) {
-      System.out.println("Nessun libro al momento.");
+      System.out.println("Non hai nessun libro in prestito");
     } else {
       for (Book b : borrowedBooks) {
-        System.out.println("- " + b.title);
+        System.out.println("- " + b.title + " (Preso il: "+b.loanDate+")");
       }
     }
   }
@@ -74,8 +77,9 @@ class Library {
       if (b.title.equalsIgnoreCase(title)) {
         if (b.isAvailable) {
           b.isAvailable = false;
+          b.loanDate = LocalDate.now(); // Registra la data attuale
           user.borrowedBooks.add(b);
-          System.out.println("Prestito effettuato con successo!");
+          System.out.println("Prestito effettuato con successo il "+b.loanDate);
           return;
         } else {
           System.out.println("Il libro è già in prestito");
@@ -89,7 +93,16 @@ class Library {
   void returnBook(String title, User user) {
     for (Book b : user.borrowedBooks) {
       if (b.title.equalsIgnoreCase(title)) {
+        // Calcolo penalità
+        long giorniTrascorsi = ChronoUnit.DAYS.between(b.loanDate, LocalDate.now());
+        if (giorniTrascorsi > 14) {
+          double penale = (giorniTrascorsi - 14) * 0.50; // Esempio: 50 cent al giorno
+          System.out.println("ATTENZIONE: Restituzione in ritardo di "+giorniTrascorsi+" giorni");
+          System.out.println("Penale da pagare: " + penale + " EUR");
+        }
+
         b.isAvailable = true;
+        b.loanDate = null;
         user.borrowedBooks.remove(b);
         System.out.println("Il libro è stato restituito");
         return;
