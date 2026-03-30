@@ -1,4 +1,4 @@
-// import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 class BankAccount {
@@ -24,7 +24,7 @@ class BankAccount {
       this.balance = this.balance - amount;
       System.out.println("Prelevati "+amount+" EUR\nSaldo attuale: "+this.balance+" EUR\n\n");
     } else {
-      System.out.println("Il valore inserito non è valido\n\n");
+      System.out.println("Il valore inserito non è valido o saldo insufficiente\n\n");
     }
   }
 
@@ -35,14 +35,35 @@ class BankAccount {
 
 public class EsercizioBankAccount {
   public static void main(String[] args) {
-    BankAccount account1 = new BankAccount("Miche", 0); // accurato
     Scanner input = new Scanner(System.in);
+    
+    // Creo l'ArrayList di conti +popolamento iniziale
+    ArrayList<BankAccount> conti = new ArrayList<>();
+    conti.add(new BankAccount("Miche", 0.0)); // accurato
+    conti.add(new BankAccount("Mario", 500.0));
 
+    System.out.print("Inserisci il nome del titolare per accedere al conto: ");
+    String nomeAccesso = input.nextLine();
+    
+    BankAccount accountAttivo = null;
+
+    for (BankAccount b : conti) {
+      if (b.accountHolderName.equalsIgnoreCase(nomeAccesso)) {
+        accountAttivo = b; // Trovato: salvo il riferimento
+        break;
+      }
+    }
+
+    // Verifico se l'account è stato trovato 
+    if (accountAttivo == null) {
+      System.out.println("Accesso negato: account non trovato.");
+    } else {
+      System.out.println("Ciao " + accountAttivo.accountHolderName);
       boolean continua = true;
 
       while (continua) {
         // Menu di navigazione
-        System.out.println("\n--- MENU \"PER UN SOLO CONTO\" ---");
+        System.out.println("\n--- CONTO DI " + accountAttivo.accountHolderName.toUpperCase() + " ---");
         System.out.println("1 - Visualizza saldo");
         System.out.println("2 - Effettua deposito");
         System.out.println("3 - Effettua prelievo");
@@ -53,24 +74,24 @@ public class EsercizioBankAccount {
 
         switch (scelta) {
           case 1:
-            account1.displayBalance();
+            accountAttivo.displayBalance();
             break;
           
           case 2:
             System.out.print("Quanto vuoi depositare? ");
             double depositAmount = input.nextDouble();
-            account1.deposit(depositAmount);
+            accountAttivo.deposit(depositAmount);
             break;
           
           case 3: 
             System.out.print("Quanto vuoi prelevare? ");
             double withdrawAmount = input.nextDouble();
-            account1.withdraw(withdrawAmount);
+            accountAttivo.withdraw(withdrawAmount);
             break;
           
           case 4: 
             continua = false;
-            System.out.println("Adios\n");
+            System.out.println("\nGrazie per averci scelto, buona giornata\n");
             break;
           
           default:
@@ -79,5 +100,6 @@ public class EsercizioBankAccount {
       }
 
     input.close();
+    }
   }
 }
