@@ -128,7 +128,7 @@ public class EsercizioMissioneSpaziale {
     StazioneSpaziale stazione = new StazioneSpaziale();
     Astronauta astronauta = null;
 
-    int scelta = 1;
+    int scelta = -1;
     while (scelta != 5) {
       System.out.println("\n1. Crea astronauta");
       System.out.println("2. Visualizza dati");
