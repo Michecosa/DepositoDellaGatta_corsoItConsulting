@@ -34,74 +34,73 @@ class StazioneSpaziale {
 
 //  CLASSI DERIVATE 
 class Scienziato extends Astronauta {
-  private int azioni = 0;
-  private boolean isCapo = false;
-  private StazioneSpaziale stazione;
+  protected int azioni = 0;
+  protected StazioneSpaziale stazione;
 
   public Scienziato(String nome, String email, StazioneSpaziale stazione) {
     super(nome, email);
     this.stazione = stazione;
   }
 
-  public void aggiungiEsperimento(String exp) {
+  public Astronauta aggiungiEsperimento(String exp) {
     stazione.esperimenti.add(exp);
     azioni++;
     System.out.println("Esperimento aggiunto: " + exp);
-    if (azioni >= 3 && !isCapo) {
-      isCapo = true;
+    if (azioni >= 3) {
+      ScienziatoCapo capo = new ScienziatoCapo(nome, email, stazione);
+      capo.azioni = azioni;
       System.out.println("Sei diventato ScienziatoCapo!");
+      return capo;
     }
+    return this;
+  }
+}
+
+class ScienziatoCapo extends Scienziato {
+  public ScienziatoCapo(String nome, String email, StazioneSpaziale stazione) {
+    super(nome, email, stazione);
   }
 
   public void mostraEsperimentiTutti() {
-    if (!isCapo) {
-      System.out.println("Funzione disponibile solo per ScienziatoCapo");
-      return;
-    }
-    
     System.out.println("Tutti gli esperimenti:");
-    for (String e : stazione.esperimenti) 
-      System.out.println("- " + e);
+    for (String e : stazione.esperimenti) System.out.println("- " + e);
   }
-
-  public boolean isCapo() { return isCapo; }
 }
 
 class Ispettore extends Astronauta {
-  private int azioni = 0;
-  private boolean isEsperto = false;
-  private StazioneSpaziale stazione;
+  protected int azioni = 0;
+  protected StazioneSpaziale stazione;
 
   public Ispettore(String nome, String email, StazioneSpaziale stazione) {
     super(nome, email);
     this.stazione = stazione;
   }
 
-  public void aggiungiValutazione(int val) {
-    if (val < 1 || val > 5) { 
-      System.out.println("Valutazione non valida (1-5)"); 
-      return; 
-    }
+  public Astronauta aggiungiValutazione(int val) {
+    if (val < 1 || val > 5) { System.out.println("Valutazione non valida (1-5)."); return this; }
     stazione.valutazioni.add(val);
     azioni++;
 
     System.out.println("Valutazione aggiunta: " + val);
-    if (azioni >= 3 && !isEsperto) {
-      isEsperto = true;
+    if (azioni >= 3) {
+      IspettoreEsperto esperto = new IspettoreEsperto(nome, email, stazione);
+      esperto.azioni = azioni;
       System.out.println("Sei diventato IspettoreEsperto!");
+      return esperto;
     }
+    return this;
+  }
+}
+
+class IspettoreEsperto extends Ispettore {
+  public IspettoreEsperto(String nome, String email, StazioneSpaziale stazione) {
+    super(nome, email, stazione);
   }
 
   public void mostraValutazioniTutte() {
-    if (!isEsperto) {
-      System.out.println("Funzione disponibile solo per IspettoreEsperto");
-      return;
-    }
     System.out.println("Tutte le valutazioni:");
     for (int v : stazione.valutazioni) System.out.println("- " + v);
   }
-
-  public boolean isEsperto() { return isEsperto; }
 }
 
 //  MAIN 
@@ -167,7 +166,7 @@ public class EsercizioMissioneSpaziale {
           if (astronauta instanceof Scienziato) {
             Scienziato s = (Scienziato) astronauta;
             System.out.println("a. Aggiungi esperimento");
-            if (s.isCapo()) 
+            if (s instanceof ScienziatoCapo) 
               System.out.println("b. Mostra tutti gli esperimenti (ScienziatoCapo)");
 
             System.out.print("Scelta: ");
@@ -175,25 +174,23 @@ public class EsercizioMissioneSpaziale {
 
             if (sub.equals("a")) {
               System.out.print("Nome esperimento: ");
-              s.aggiungiEsperimento(scanner.nextLine());
-            } else if (sub.equals("b")) {
-              s.mostraEsperimentiTutti();
+              astronauta = s.aggiungiEsperimento(scanner.nextLine());
+            } else if (sub.equals("b") && s instanceof ScienziatoCapo) {
+              ((ScienziatoCapo) s).mostraEsperimentiTutti();
             }
 
           } else if (astronauta instanceof Ispettore) {
             Ispettore i = (Ispettore) astronauta;
             System.out.println("a. Inserisci valutazione (1-5)");
-            if (i.isEsperto()) 
-              System.out.println("b. Mostra tutte le valutazioni (IspettoreEsperto)");
-
+            if (i instanceof IspettoreEsperto) System.out.println("b. Mostra tutte le valutazioni (IspettoreEsperto)");
             System.out.print("Scelta: ");
             String sub = scanner.nextLine();
 
             if (sub.equals("a")) {
               System.out.print("Valutazione: ");
-              i.aggiungiValutazione(Integer.parseInt(scanner.nextLine()));
-            } else if (sub.equals("b")) {
-              i.mostraValutazioniTutte();
+              astronauta = i.aggiungiValutazione(Integer.parseInt(scanner.nextLine()));
+            } else if (sub.equals("b") && i instanceof IspettoreEsperto) {
+              ((IspettoreEsperto) i).mostraValutazioniTutte();
             }
           }
           break;
