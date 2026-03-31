@@ -28,8 +28,16 @@ class Astronauta {
 
 //  CLASSE CONTENITORE 
 class StazioneSpaziale {
-  ArrayList<String> esperimenti = new ArrayList<>();
-  ArrayList<Integer> valutazioni = new ArrayList<>();
+  static class Esperimento {
+    String nome;
+    Integer valutazione;
+
+    Esperimento(String nome) { 
+      this.nome = nome; 
+    }
+  }
+
+  ArrayList<Esperimento> esperimenti = new ArrayList<>();
 }
 
 //  CLASSI DERIVATE 
@@ -43,7 +51,7 @@ class Scienziato extends Astronauta {
   }
 
   public Astronauta aggiungiEsperimento(String exp) {
-    stazione.esperimenti.add(exp);
+    stazione.esperimenti.add(new StazioneSpaziale.Esperimento(exp));
     azioni++;
     System.out.println("Esperimento aggiunto: " + exp);
     if (azioni >= 3) {
@@ -63,7 +71,8 @@ class ScienziatoCapo extends Scienziato {
 
   public void mostraEsperimentiTutti() {
     System.out.println("Tutti gli esperimenti:");
-    for (String e : stazione.esperimenti) System.out.println("- " + e);
+    for (StazioneSpaziale.Esperimento e : stazione.esperimenti)
+      System.out.println("- " + e.nome + " | valutazione: " + (e.valutazione != null ? e.valutazione : "nessuna"));
   }
 }
 
@@ -76,9 +85,17 @@ class Ispettore extends Astronauta {
     this.stazione = stazione;
   }
 
-  public Astronauta aggiungiValutazione(int val) {
-    if (val < 1 || val > 5) { System.out.println("Valutazione non valida (1-5)."); return this; }
-    stazione.valutazioni.add(val);
+  public Astronauta aggiungiValutazione(int val, int indice) {
+    if (val < 1 || val > 5) { 
+      System.out.println("Valutazione non valida (1-5)."); 
+      return this; 
+    }
+
+    if (indice < 0 || indice >= stazione.esperimenti.size()) { 
+      System.out.println("Indice esperimento non valido."); 
+      return this; 
+    }
+    stazione.esperimenti.get(indice).valutazione = val;
     azioni++;
 
     System.out.println("Valutazione aggiunta: " + val);
@@ -99,7 +116,8 @@ class IspettoreEsperto extends Ispettore {
 
   public void mostraValutazioniTutte() {
     System.out.println("Tutte le valutazioni:");
-    for (int v : stazione.valutazioni) System.out.println("- " + v);
+    for (StazioneSpaziale.Esperimento e : stazione.esperimenti)
+      if (e.valutazione != null) System.out.println("- " + e.nome + ": " + e.valutazione);
   }
 }
 
@@ -164,9 +182,9 @@ public class EsercizioMissioneSpaziale {
           }
 
           if (astronauta instanceof Scienziato) {
-            Scienziato s = (Scienziato) astronauta;
+            Scienziato scienziato = (Scienziato) astronauta;
             System.out.println("a. Aggiungi esperimento");
-            if (s instanceof ScienziatoCapo) 
+            if (scienziato instanceof ScienziatoCapo) 
               System.out.println("b. Mostra tutti gli esperimenti (ScienziatoCapo)");
 
             System.out.print("Scelta: ");
@@ -174,23 +192,38 @@ public class EsercizioMissioneSpaziale {
 
             if (sub.equals("a")) {
               System.out.print("Nome esperimento: ");
-              astronauta = s.aggiungiEsperimento(scanner.nextLine());
-            } else if (sub.equals("b") && s instanceof ScienziatoCapo) {
-              ((ScienziatoCapo) s).mostraEsperimentiTutti();
+              astronauta = scienziato.aggiungiEsperimento(scanner.nextLine());
+            } else if (sub.equals("b") && scienziato instanceof ScienziatoCapo) {
+              ((ScienziatoCapo) scienziato).mostraEsperimentiTutti();
             }
 
           } else if (astronauta instanceof Ispettore) {
-            Ispettore i = (Ispettore) astronauta;
+            Ispettore ispettore = (Ispettore) astronauta;
             System.out.println("a. Inserisci valutazione (1-5)");
-            if (i instanceof IspettoreEsperto) System.out.println("b. Mostra tutte le valutazioni (IspettoreEsperto)");
+
+            if (ispettore instanceof IspettoreEsperto) 
+              System.out.println("b. Mostra tutte le valutazioni (IspettoreEsperto)");
+
             System.out.print("Scelta: ");
             String sub = scanner.nextLine();
 
             if (sub.equals("a")) {
-              System.out.print("Valutazione: ");
-              astronauta = i.aggiungiValutazione(Integer.parseInt(scanner.nextLine()));
-            } else if (sub.equals("b") && i instanceof IspettoreEsperto) {
-              ((IspettoreEsperto) i).mostraValutazioniTutte();
+              if (stazione.esperimenti.isEmpty()) { 
+                System.out.println("Nessun esperimento disponibile"); 
+                break; 
+              }
+
+              System.out.println("Scegli esperimento da valutare:");
+              for (int idx = 0; idx < stazione.esperimenti.size(); idx++)
+                System.out.println(idx + ". " + stazione.esperimenti.get(idx).nome);
+
+              System.out.print("Indice: ");
+              int indice = Integer.parseInt(scanner.nextLine());
+              System.out.print("Valutazione (1-5): ");
+              astronauta = ispettore.aggiungiValutazione(Integer.parseInt(scanner.nextLine()), indice);
+
+            } else if (sub.equals("b") && ispettore instanceof IspettoreEsperto) {
+              ((IspettoreEsperto) ispettore).mostraValutazioniTutte();
             }
           }
           break;
