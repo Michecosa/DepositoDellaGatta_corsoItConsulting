@@ -285,7 +285,6 @@ class Sartoria {
             System.out.println();
         }
     }
-
     public void mostraAccessori() {
         System.out.println("=== COMPONENTI FINITURA ===");
         for (ComponenteFinitura f : accessori) {
