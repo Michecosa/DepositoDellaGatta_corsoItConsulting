@@ -1,12 +1,11 @@
 // ! Nota xMirko: L'esercizio l'ho iniziato nella cartella della Mattina e poi ho caricato in Pomeriggio la versione finale
 
-
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
 // *** Classe base: CapoPrincipale ***
 class CapoPrincipale {
+    // Campi private per garantire l'incapsulamento: l'accesso è permesso solo tramite getter/setter
     private String codice;
     private String nome;
     private String tessuto;
@@ -15,6 +14,7 @@ class CapoPrincipale {
     private double prezzo;
 
     public CapoPrincipale(String codice, String nome, String tessuto, String colore, String taglia, double prezzo) {
+        // L'uso dei setter nel costruttore assicura che i vincoli di validazione siano applicati fin dalla creazione
         setCodice(codice);
         setNome(nome);
         setTessuto(tessuto);
@@ -30,6 +30,7 @@ class CapoPrincipale {
     public String getTaglia() { return taglia; }
     public double getPrezzo() { return prezzo; }
 
+    // Metodi setter con logica di validazione (fail-fast) per prevenire dati inconsistenti
     public void setCodice(String codice) {
         if (codice == null || codice.trim().isEmpty())
             throw new IllegalArgumentException("Il codice non può essere vuoto");
@@ -79,6 +80,7 @@ class Giacca extends CapoPrincipale {
     private int numeroBottoni;
 
     public Giacca(String codice, String nome, String tessuto, String colore, String taglia, double prezzo, int numeroBottoni) {
+        // super() richiama il costruttore della classe madre CapoPrincipale
         super(codice, nome, tessuto, colore, taglia, prezzo);
         setNumeroBottoni(numeroBottoni);
     }
@@ -94,6 +96,7 @@ class Giacca extends CapoPrincipale {
     @Override
     public void mostraDettagli() {
         System.out.println("-- Giacca --");
+        // Riutilizza la logica di stampa della classe madre aggiungendo poi le specifiche della sottoclasse
         super.mostraDettagli();
         System.out.println("Numero bottoni: " + numeroBottoni);
     }
@@ -138,6 +141,7 @@ class Gilet extends CapoPrincipale {
     public void mostraDettagli() {
         System.out.println("-- Gilet --");
         super.mostraDettagli();
+        // Operatore ternario per rendere leggibile il valore booleano all'utente
         System.out.println("Rever presente: " + (reverPresente ? "Si" : "No"));
     }
 }
@@ -277,6 +281,7 @@ class Pochette extends ComponenteFinitura {
 
 // *** Classe Sartoria ***
 class Sartoria {
+    // Gestione separata delle liste per differenziare Capi e Accessori (Polimorfismo applicato alle sottoclassi)
     private ArrayList<CapoPrincipale> capi = new ArrayList<>();
     private ArrayList<ComponenteFinitura> accessori = new ArrayList<>();
 
@@ -286,7 +291,7 @@ class Sartoria {
     public void mostraCapi() {
         System.out.println("=== CAPI PRINCIPALI ===");
         for (CapoPrincipale c : capi) {
-            c.mostraDettagli();
+            c.mostraDettagli(); // Il polimorfismo chiama il metodo corretto della sottoclasse (Giacca, Pantalone, ecc.)
             System.out.println();
         }
     }
@@ -319,7 +324,7 @@ public class EsercizioSuite {
         Sartoria sartoria = new Sartoria();
         Scanner sc = new Scanner(System.in);
 
-        // Dati iniziali precaricati
+        // Dati iniziali precaricati per testare subito le funzionalità
         sartoria.aggiungiCapo(new Giacca("CP001", "Giacca Smoking", "Lana Merino", "Nero", "50", 480.00, 2));
         sartoria.aggiungiCapo(new Pantalone("CP002", "Pantalone Classico", "Flanella", "Antracite", "48", 220.00, "Taglio Italiano"));
         sartoria.aggiungiCapo(new Gilet("CP003", "Gilet Formale", "Seta", "Bordeaux", "50", 175.00, true));
@@ -337,6 +342,7 @@ public class EsercizioSuite {
             System.out.println("5. Mostra riepilogo prezzi");
             System.out.println("0. Esci");
             System.out.print("Scelta: ");
+            // parseInt(nextLine()) evita il problema del "newline" residuo nel buffer dello scanner
             scelta = Integer.parseInt(sc.nextLine().trim());
 
             switch (scelta) {
@@ -353,6 +359,7 @@ public class EsercizioSuite {
         sc.close();
     }
 
+    // Metodo helper statico per gestire la creazione guidata di un CapoPrincipale
     private static void aggiungiCapo(Sartoria sartoria, Scanner sc) {
         System.out.println("\nTipo di capo:");
         System.out.println("1. Giacca");
@@ -380,6 +387,7 @@ public class EsercizioSuite {
         double prezzo = Double.parseDouble(sc.nextLine().trim());
 
         try {
+            // Logica di switch per instanziare la classe specifica corretta
             switch (tipo) {
                 case 1 -> {
                     System.out.print("Numero bottoni: ");
@@ -400,10 +408,12 @@ public class EsercizioSuite {
             }
             System.out.println("Capo aggiunto con successo");
         } catch (IllegalArgumentException e) {
+            // Cattura gli errori di validazione definiti nei setter delle classi base
             System.out.println("Errore: " + e.getMessage());
         }
     }
 
+    // Metodo helper statico per gestire la creazione guidata di un ComponenteFinitura
     private static void aggiungiAccessorio(Sartoria sartoria, Scanner sc) {
         System.out.println("\nTipo di componente finitura:");
         System.out.println("1. Cravatta");
