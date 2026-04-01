@@ -32,7 +32,7 @@ class GestoreSaluti {
 }
 
 // Classe principale
-public class ProvaPolimorfismo {
+public class EsercizioPolimorfismo {
   public static void main(String[] args) {
     Persona p1 = new Persona("Mario");
     Persona p2 = new Persona("Luigi");
