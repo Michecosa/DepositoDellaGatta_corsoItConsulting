@@ -72,12 +72,12 @@ class Ristorante {
 }
 
 class FastFood extends Ristorante {
-    public FastFood(String nome) { super(nome); }
-    @Override
-    public void servi(ArrayList<Cibo> ordine) {
-      System.out.println("\n--- " + nomeRisto + " ---");
-      for (Cibo c : ordine) { System.out.print("[FAST] "); c.prepara(); }
-    }
+  public FastFood(String nome) { super(nome); }
+  @Override
+  public void servi(ArrayList<Cibo> ordine) {
+    System.out.println("\n--- " + nomeRisto + " ---");
+    for (Cibo c : ordine) { System.out.print("[FAST] "); c.prepara(); }
+  }
 }
 
 class RistoranteStellato extends Ristorante {
