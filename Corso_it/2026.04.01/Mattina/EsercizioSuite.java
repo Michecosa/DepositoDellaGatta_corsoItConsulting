@@ -10,12 +10,12 @@ class CapoPrincipale {
     private double prezzo;
 
     public CapoPrincipale(String codice, String nome, String tessuto, String colore, String taglia, double prezzo) {
-        this.codice = codice;
-        this.nome = nome;
-        this.tessuto = tessuto;
-        this.colore = colore;
-        this.taglia = taglia;
-        this.prezzo = prezzo;
+        setCodice(codice);
+        setNome(nome);
+        setTessuto(tessuto);
+        setColore(colore);
+        setTaglia(taglia);
+        setPrezzo(prezzo);
     }
 
     public String getCodice() { return codice; }
@@ -24,13 +24,42 @@ class CapoPrincipale {
     public String getColore() { return colore; }
     public String getTaglia() { return taglia; }
     public double getPrezzo() { return prezzo; }
-    
-    public void setCodice(String codice) { this.codice = codice; }
-    public void setNome(String nome) { this.nome = nome; }
-    public void setTessuto(String tessuto) { this.tessuto = tessuto; }
-    public void setColore(String colore) { this.colore = colore; }
-    public void setTaglia(String taglia) { this.taglia = taglia; }
-    public void setPrezzo(double prezzo) { this.prezzo = prezzo; }
+
+    public void setCodice(String codice) {
+        if (codice == null || codice.trim().isEmpty())
+            throw new IllegalArgumentException("Il codice non può essere vuoto");
+        this.codice = codice.trim();
+    }
+
+    public void setNome(String nome) {
+        if (nome == null || nome.trim().isEmpty())
+            throw new IllegalArgumentException("Il nome non può essere vuoto");
+        this.nome = nome.trim();
+    }
+
+    public void setTessuto(String tessuto) {
+        if (tessuto == null || tessuto.trim().isEmpty())
+            throw new IllegalArgumentException("Il tessuto non può essere vuoto");
+        this.tessuto = tessuto.trim();
+    }
+
+    public void setColore(String colore) {
+        if (colore == null || colore.trim().isEmpty())
+            throw new IllegalArgumentException("Il colore non può essere vuoto");
+        this.colore = colore.trim();
+    }
+
+    public void setTaglia(String taglia) {
+        if (taglia == null || taglia.trim().isEmpty())
+            throw new IllegalArgumentException("La taglia non può essere vuota");
+        this.taglia = taglia.trim();
+    }
+
+    public void setPrezzo(double prezzo) {
+        if (prezzo <= 0)
+            throw new IllegalArgumentException("Il prezzo deve essere maggiore di 0");
+        this.prezzo = prezzo;
+    }
 
     public void mostraDettagli() {
         System.out.println("Codice: " + codice + " | Nome: " + nome);
@@ -46,11 +75,16 @@ class Giacca extends CapoPrincipale {
 
     public Giacca(String codice, String nome, String tessuto, String colore, String taglia, double prezzo, int numeroBottoni) {
         super(codice, nome, tessuto, colore, taglia, prezzo);
-        this.numeroBottoni = numeroBottoni;
+        setNumeroBottoni(numeroBottoni);
     }
 
     public int getNumeroBottoni() { return numeroBottoni; }
-    public void setNumeroBottoni(int numeroBottoni) { this.numeroBottoni = numeroBottoni; }
+
+    public void setNumeroBottoni(int numeroBottoni) {
+        if (numeroBottoni < 0)
+            throw new IllegalArgumentException("Il numero di bottoni non può essere negativo");
+        this.numeroBottoni = numeroBottoni;
+    }
 
     @Override
     public void mostraDettagli() {
@@ -65,11 +99,16 @@ class Pantalone extends CapoPrincipale {
 
     public Pantalone(String codice, String nome, String tessuto, String colore, String taglia, double prezzo, String tipoTaglio) {
         super(codice, nome, tessuto, colore, taglia, prezzo);
-        this.tipoTaglio = tipoTaglio;
+        setTipoTaglio(tipoTaglio);
     }
 
     public String getTipoTaglio() { return tipoTaglio; }
-    public void setTipoTaglio(String tipoTaglio) { this.tipoTaglio = tipoTaglio; }
+
+    public void setTipoTaglio(String tipoTaglio) {
+        if (tipoTaglio == null || tipoTaglio.trim().isEmpty())
+            throw new IllegalArgumentException("Il tipo di taglio non può essere vuoto.");
+        this.tipoTaglio = tipoTaglio.trim();
+    }
 
     @Override
     public void mostraDettagli() {
@@ -107,11 +146,11 @@ class ComponenteFinitura {
     private double prezzo;
 
     public ComponenteFinitura(String codice, String nome, String materiale, String colore, double prezzo) {
-        this.codice = codice;
-        this.nome = nome;
-        this.materiale = materiale;
-        this.colore = colore;
-        this.prezzo = prezzo;
+        setCodice(codice);
+        setNome(nome);
+        setMateriale(materiale);
+        setColore(colore);
+        setPrezzo(prezzo);
     }
 
     public String getCodice() { return codice; }
@@ -120,11 +159,35 @@ class ComponenteFinitura {
     public String getColore() { return colore; }
     public double getPrezzo() { return prezzo; }
 
-    public void setCodice(String codice) { this.codice = codice; }
-    public void setNome(String nome) { this.nome = nome; }
-    public void setMateriale(String materiale) { this.materiale = materiale; }
-    public void setColore(String colore) { this.colore = colore; }
-    public void setPrezzo(double prezzo) { this.prezzo = prezzo; }
+    public void setCodice(String codice) {
+        if (codice == null || codice.trim().isEmpty())
+            throw new IllegalArgumentException("Il codice non può essere vuoto");
+        this.codice = codice.trim();
+    }
+
+    public void setNome(String nome) {
+        if (nome == null || nome.trim().isEmpty())
+            throw new IllegalArgumentException("Il nome non può essere vuoto");
+        this.nome = nome.trim();
+    }
+
+    public void setMateriale(String materiale) {
+        if (materiale == null || materiale.trim().isEmpty())
+            throw new IllegalArgumentException("Il materiale non può essere vuoto");
+        this.materiale = materiale.trim();
+    }
+
+    public void setColore(String colore) {
+        if (colore == null || colore.trim().isEmpty())
+            throw new IllegalArgumentException("Il colore non può essere vuoto");
+        this.colore = colore.trim();
+    }
+
+    public void setPrezzo(double prezzo) {
+        if (prezzo <= 0)
+            throw new IllegalArgumentException("Il prezzo deve essere maggiore di 0");
+        this.prezzo = prezzo;
+    }
 
     public void mostraDettagli() {
         System.out.println("Codice: " + codice + " | Nome: " + nome);
@@ -140,11 +203,16 @@ class Cravatta extends ComponenteFinitura {
 
     public Cravatta(String codice, String nome, String materiale, String colore, double prezzo, double larghezza) {
         super(codice, nome, materiale, colore, prezzo);
-        this.larghezza = larghezza;
+        setLarghezza(larghezza);
     }
 
     public double getLarghezza() { return larghezza; }
-    public void setLarghezza(double larghezza) { this.larghezza = larghezza; }
+
+    public void setLarghezza(double larghezza) {
+        if (larghezza <= 0)
+            throw new IllegalArgumentException("La larghezza deve essere maggiore di 0");
+        this.larghezza = larghezza;
+    }
 
     @Override
     public void mostraDettagli() {
@@ -159,11 +227,16 @@ class Papillon extends ComponenteFinitura {
 
     public Papillon(String codice, String nome, String materiale, String colore, double prezzo, String tipoChiusura) {
         super(codice, nome, materiale, colore, prezzo);
-        this.tipoChiusura = tipoChiusura;
+        setTipoChiusura(tipoChiusura);
     }
 
     public String getTipoChiusura() { return tipoChiusura; }
-    public void setTipoChiusura(String tipoChiusura) { this.tipoChiusura = tipoChiusura; }
+
+    public void setTipoChiusura(String tipoChiusura) {
+        if (tipoChiusura == null || tipoChiusura.trim().isEmpty())
+            throw new IllegalArgumentException("Il tipo di chiusura non può essere vuoto");
+        this.tipoChiusura = tipoChiusura.trim();
+    }
 
     @Override
     public void mostraDettagli() {
@@ -178,11 +251,16 @@ class Pochette extends ComponenteFinitura {
 
     public Pochette(String codice, String nome, String materiale, String colore, double prezzo, String piegaDecorativa) {
         super(codice, nome, materiale, colore, prezzo);
-        this.piegaDecorativa = piegaDecorativa;
+        setPiegaDecorativa(piegaDecorativa);
     }
 
     public String getPiegaDecorativa() { return piegaDecorativa; }
-    public void setPiegaDecorativa(String piegaDecorativa) { this.piegaDecorativa = piegaDecorativa; }
+
+    public void setPiegaDecorativa(String piegaDecorativa) {
+        if (piegaDecorativa == null || piegaDecorativa.trim().isEmpty())
+            throw new IllegalArgumentException("La piega decorativa non può essere vuota.");
+        this.piegaDecorativa = piegaDecorativa.trim();
+    }
 
     @Override
     public void mostraDettagli() {
@@ -207,6 +285,7 @@ class Sartoria {
             System.out.println();
         }
     }
+
     public void mostraAccessori() {
         System.out.println("=== COMPONENTI FINITURA ===");
         for (ComponenteFinitura f : accessori) {
