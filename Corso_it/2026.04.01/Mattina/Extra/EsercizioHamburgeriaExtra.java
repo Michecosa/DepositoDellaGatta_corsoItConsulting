@@ -72,7 +72,7 @@ class Ristorante {
 }
 
 class FastFood extends Ristorante {
-    public FastFood() { super("McDocker"); }
+    public FastFood(String nome) { super(nome); }
     @Override
     public void servi(ArrayList<Cibo> ordine) {
       System.out.println("\n--- " + nomeRisto + " ---");
@@ -81,7 +81,7 @@ class FastFood extends Ristorante {
 }
 
 class RistoranteStellato extends Ristorante {
-  public RistoranteStellato() { super("Java Gourmet"); }
+  public RistoranteStellato(String nome) { super(nome); }
   @Override
   public void servi(ArrayList<Cibo> ordine) {
     System.out.println("\n--- " + nomeRisto + " ---");
@@ -101,7 +101,7 @@ public class EsercizioHamburgeriaExtra {
     System.out.print("Seleziona: ");
     int sceltaR = input.nextInt();
     
-    Ristorante ristoScelto = (sceltaR == 1) ?  new FastFood() : new RistoranteStellato();
+    Ristorante ristoScelto = (sceltaR == 1) ?  new FastFood("McDocker") : new RistoranteStellato("Java Gourmet");
 
     boolean continua = true;
     while(continua) {
