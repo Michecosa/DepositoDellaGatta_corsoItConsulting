@@ -1,3 +1,7 @@
+// ! Nota xMirko: L'esercizio l'ho iniziato nella cartella della Mattina e poi ho caricato in Pomeriggio la versione finale
+
+
+
 import java.util.ArrayList;
 
 // *** Classe base: CapoPrincipale ***
