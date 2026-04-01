@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-// --- Classe base: CapoPrincipale ---
+// *** Classe base: CapoPrincipale ***
 class CapoPrincipale {
     private String codice;
     private String nome;
@@ -24,7 +24,7 @@ class CapoPrincipale {
     public String getColore() { return colore; }
     public String getTaglia() { return taglia; }
     public double getPrezzo() { return prezzo; }
-
+    
     public void setCodice(String codice) { this.codice = codice; }
     public void setNome(String nome) { this.nome = nome; }
     public void setTessuto(String tessuto) { this.tessuto = tessuto; }
@@ -35,7 +35,7 @@ class CapoPrincipale {
     public void mostraDettagli() {
         System.out.println("Codice: " + codice + " | Nome: " + nome);
         System.out.println("Tessuto: " + tessuto + " | Colore: " + colore + " | Taglia: " + taglia);
-        System.out.printf("Prezzo: %.2f euro%n", prezzo);
+        System.out.printf("Prezzo: %.2f EUR%n", prezzo);
     }
 }
 
@@ -98,7 +98,7 @@ class Gilet extends CapoPrincipale {
     }
 }
 
-// --- Classe base: ComponenteFinitura ---
+// *** Classe base: ComponenteFinitura ***
 class ComponenteFinitura {
     private String codice;
     private String nome;
@@ -129,7 +129,7 @@ class ComponenteFinitura {
     public void mostraDettagli() {
         System.out.println("Codice: " + codice + " | Nome: " + nome);
         System.out.println("Materiale: " + materiale + " | Colore: " + colore);
-        System.out.printf("Prezzo: %.2f euro%n", prezzo);
+        System.out.printf("Prezzo: %.2f EUR%n", prezzo);
     }
 }
 
@@ -192,7 +192,7 @@ class Pochette extends ComponenteFinitura {
     }
 }
 
-// --- Classe Sartoria ---
+// *** Classe Sartoria ***
 class Sartoria {
     private ArrayList<CapoPrincipale> capi = new ArrayList<>();
     private ArrayList<ComponenteFinitura> accessori = new ArrayList<>();
@@ -207,7 +207,6 @@ class Sartoria {
             System.out.println();
         }
     }
-
     public void mostraAccessori() {
         System.out.println("=== COMPONENTI FINITURA ===");
         for (ComponenteFinitura f : accessori) {
@@ -224,9 +223,9 @@ class Sartoria {
         for (ComponenteFinitura f : accessori) totaleAccessori += f.getPrezzo();
 
         System.out.println("=== RIEPILOGO PREZZI ===");
-        System.out.printf("Totale capi principali:     %.2f euro%n", totaleCapi);
-        System.out.printf("Totale componenti finitura: %.2f euro%n", totaleAccessori);
-        System.out.printf("Totale suite completa:      %.2f euro%n", totaleCapi + totaleAccessori);
+        System.out.printf("Totale capi principali:     %.2f EUR%n", totaleCapi);
+        System.out.printf("Totale componenti finitura: %.2f EUR%n", totaleAccessori);
+        System.out.printf("Totale suite completa:      %.2f EUR%n", totaleCapi + totaleAccessori);
     }
 }
 
