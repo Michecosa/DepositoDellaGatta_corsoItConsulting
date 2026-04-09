@@ -32,7 +32,7 @@ public class GestionePagamento {
     System.out.println("\n--- ELABORAZIONE TRANSAZIONE IN CORSO (NON CHIUDERE!) ---");
     
     // Simulo l'esecuzione del pagamento tramite il pattern Strategy
-    // Il metodo eseguiPagamento stamperà i dettagli definiti nelle tue strategie
+    // Il metodo eseguiPagamento stamperà i dettagli definiti nelle strategie
     pagamento.eseguiPagamento(550);
 
     System.out.println("\nPagamento ricevuto! Grazie per l'acquisto");
