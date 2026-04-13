@@ -1,26 +1,22 @@
 package com.example.test.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.test.service.MessaggioService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
+import com.example.test.service.SalutaService;
 
 @RestController
 public class SalutaController {
-  private final MessaggioService messaggioService;
 
-  // Constructor injection
-  @Autowired
-  public SalutaController(MessaggioService ms) {
-    this.messaggioService = ms;
+  private final SalutaService salutaService;
+
+  public SalutaController(SalutaService salutaService) {
+    this.salutaService = salutaService;
   }
 
-  @GetMapping("/saluta")
-  public String saluta() {
-    messaggioService.saluta();
-    return "Saluto inviato";
+  @PostMapping("/saluta")
+  public String saluta(@RequestBody String nome) {
+    return salutaService.saluta(nome);
   }
 }
