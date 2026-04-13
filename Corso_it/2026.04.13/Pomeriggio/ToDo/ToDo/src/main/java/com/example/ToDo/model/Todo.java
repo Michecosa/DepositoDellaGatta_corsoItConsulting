@@ -12,5 +12,5 @@ public class Todo {
   private Long id;
   private String descrizione;
   private StatoTask stato;
-  private int priorita;
+  private Integer priorita;
 }

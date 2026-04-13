@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ToDo.model.StatoTask;
@@ -31,10 +32,15 @@ public class TodoController {
     todos.add(new Todo(idCounter++, "Andare in palestra", StatoTask.TODO, 1));
   }
 
-  // Restituisce tutti i todo ordinati per priorità, poi alfabeticamente
+  // Restituisce tutti i todo, con filtri opzionali per stato e descrizione
   @GetMapping
-  public List<Todo> getAll() {
+  public List<Todo> getAll(
+      @RequestParam(required = false) StatoTask stato,
+      @RequestParam(required = false) String search) {
+
       return todos.stream()
+          .filter(t -> stato == null || t.getStato() == stato)
+          .filter(t -> search == null || t.getDescrizione().toLowerCase().contains(search.toLowerCase()))
           .sorted(Comparator.comparingInt((Todo t) -> t.getPriorita())
               .thenComparing(t -> t.getDescrizione()))
           .collect(Collectors.toList());
