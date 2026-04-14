@@ -3,48 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster Pro - Advanced ToDo Management</title>
+    <title>TaskMaster Pro - Minimal Edition</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS (CDN per prototipazione veloce) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        darkBg: '#0f172a',
-                        cardGlass: 'rgba(30, 41, 59, 0.7)',
-                        accent: '#8b5cf6',
-                        accentHover: '#7c3aed',
-                        state: {
-                            TODO: '#3b82f6', // blue
-                            IN_PROGRESS: '#eab308', // yellow
-                            DONE: '#22c55e', // green
-                            CANCELLED: '#ef4444' // red
-                        }
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.4s ease-out forwards',
-                        'slide-up': 'slideUp 0.4s ease-out forwards',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
+                        primary: '#3B82F6',
+                        bglight: '#F9FAFB',
+                        textMain: '#1F2937',
+                        textMuted: '#6B7280',
+                        borderLight: '#E5E7EB'
                     }
                 }
             }
@@ -55,85 +35,79 @@
     <link rel="stylesheet" href="styles.css">
     
     <!-- FontAwesome JS for Icons -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <!-- As an alternative, let's use a CDN for FontAwesome that doesn't require a kit -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-darkBg text-white min-h-screen relative overflow-x-hidden antialiased flex flex-col">
-
-    <!-- Ambient Background Effects -->
-    <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[100px] pointer-events-none"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+<body class="bg-bglight text-textMain min-h-screen relative overflow-x-hidden antialiased flex flex-col">
 
     <!-- Header Section -->
-    <header class="w-full glass-header sticky top-0 z-50 border-b border-white/10">
+    <header class="w-full bg-white border-b border-borderLight sticky top-0 z-50">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
-                    <i class="fa-solid fa-list-check text-xl"></i>
-                </div>
-                <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 tracking-tight">TaskMaster Pro</h1>
+                <i class="fa-solid fa-check-double text-xl text-primary"></i>
+                <h1 class="text-xl font-bold tracking-tight">TaskMaster</h1>
             </div>
             
             <!-- Search Bar -->
-            <div class="relative hidden md:block w-64">
-                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="searchInput" placeholder="Cerca task..." class="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-white placeholder-gray-400">
+            <div class="relative hidden mx-auto md:block w-72">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textMuted text-sm"></i>
+                <input type="text" id="searchInput" placeholder="Cerca task..." class="w-full bg-bglight border border-borderLight rounded-md py-1.5 pl-9 pr-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-textMain placeholder-textMuted">
             </div>
+            
+            <div class="w-24"></div> <!-- Spacer per bilanciare header -->
         </div>
     </header>
 
-    <main class="container mx-auto px-6 py-8 flex-grow flex flex-col z-10 animate-fade-in">
+    <main class="container mx-auto max-w-5xl px-6 py-8 flex-grow flex flex-col z-10 transition-opacity duration-300">
+        
+        <h2 class="text-2xl font-bold mb-6">Gestione Task</h2>
         
         <!-- Add Task Section -->
-        <section class="glass-card mb-10 py-6 px-8 rounded-2xl border border-white/10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row gap-6 items-center">
-            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 pointer-events-none"></div>
+        <section class="bg-white mb-8 py-5 px-6 rounded-xl border border-borderLight shadow-sm flex flex-col lg:flex-row gap-5 items-center">
             
-            <div class="w-full md:w-2/3 relative z-10 flex flex-col gap-2">
-                <h2 class="text-xl font-semibold mb-1">Crea Nuovo Task</h2>
-                <input type="text" id="newTaskDesc" placeholder="Cosa devi fare oggi?" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-white placeholder-gray-400 text-lg">
+            <div class="w-full lg:flex-grow relative flex gap-3 items-center">
+                <input type="text" id="newTaskDesc" placeholder="Aggiungi una nuova attività..." class="w-full bg-white border border-borderLight rounded-md py-2.5 px-4 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-textMain placeholder-textMuted text-sm sm:text-base">
             </div>
             
-            <div class="w-full md:w-1/3 relative z-10 flex gap-4 items-end">
-                <div class="flex-grow">
-                    <label class="block text-sm text-gray-400 mb-2">Priorità (1 = max)</label>
-                    <div class="flex gap-2 bg-white/5 border border-white/10 p-1.5 rounded-xl w-fit">
-                        <button onclick="setPriority(1)" id="prio-1" class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white bg-purple-600 shadow-md shadow-purple-500/20 transition-all focus:outline-none scale-110">1</button>
-                        <button onclick="setPriority(2)" id="prio-2" class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-gray-400 hover:bg-white/10 transition-all focus:outline-none">2</button>
-                        <button onclick="setPriority(3)" id="prio-3" class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-gray-400 hover:bg-white/10 transition-all focus:outline-none">3</button>
+            <div class="w-full lg:w-auto flex justify-between lg:justify-end items-center gap-6 shrink-0">
+                <div class="flex items-center gap-3">
+                    <label class="text-sm font-medium text-textMuted hidden sm:block">Priorità:</label>
+                    <div class="flex gap-1.5" id="priorityContainer">
+                        <button onclick="setPriority(1)" id="prio-1" class="w-8 h-8 rounded-md flex items-center justify-center font-medium text-sm text-white bg-primary border border-primary transition-colors focus:outline-none shadow-sm">1</button>
+                        <button onclick="setPriority(2)" id="prio-2" class="w-8 h-8 rounded-md flex items-center justify-center font-medium text-sm text-textMuted bg-white border border-borderLight hover:bg-gray-50 hover:text-textMain transition-colors focus:outline-none">2</button>
+                        <button onclick="setPriority(3)" id="prio-3" class="w-8 h-8 rounded-md flex items-center justify-center font-medium text-sm text-textMuted bg-white border border-borderLight hover:bg-gray-50 hover:text-textMain transition-colors focus:outline-none">3</button>
                     </div>
                 </div>
-                <button onclick="createTask()" class="h-[52px] px-6 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25 flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Crea</span>
+                
+                <button onclick="createTask()" class="h-10 px-6 rounded-md bg-primary hover:bg-blue-600 text-white font-medium text-sm transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-plus text-xs"></i> Crea
                 </button>
             </div>
         </section>
 
-        <!-- Filters -->
-        <div class="flex gap-3 mb-6 overflow-x-auto pb-4 custom-scrollbar">
-            <button onclick="setFilter('ALL')" id="filter-ALL" class="filter-btn active px-5 py-2 rounded-full border border-white/10 bg-white/10 text-sm font-medium transition-all hover:bg-white/20 whitespace-nowrap">Tutti i Task</button>
-            <button onclick="setFilter('TODO')" id="filter-TODO" class="filter-btn px-5 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium transition-all hover:bg-white/20 whitespace-nowrap flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-state-TODO"></span>Da Fare</button>
-            <button onclick="setFilter('IN_PROGRESS')" id="filter-IN_PROGRESS" class="filter-btn px-5 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium transition-all hover:bg-white/20 whitespace-nowrap flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-state-IN_PROGRESS"></span>In Corso</button>
-            <button onclick="setFilter('DONE')" id="filter-DONE" class="filter-btn px-5 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium transition-all hover:bg-white/20 whitespace-nowrap flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-state-DONE"></span>Completati</button>
-            <button onclick="setFilter('CANCELLED')" id="filter-CANCELLED" class="filter-btn px-5 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium transition-all hover:bg-white/20 whitespace-nowrap flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-state-CANCELLED"></span>Annullati</button>
+        <!-- Filters (Tabs) -->
+        <div class="flex gap-6 mb-6 border-b border-borderLight w-full overflow-x-auto custom-scrollbar">
+            <button onclick="setFilter('ALL')" id="filter-ALL" class="tab-btn tab-active pb-2.5 px-1 text-sm text-textMuted hover:text-textMain transition-colors whitespace-nowrap">Tutti i Task</button>
+            <button onclick="setFilter('TODO')" id="filter-TODO" class="tab-btn pb-2.5 px-1 text-sm text-textMuted hover:text-textMain transition-colors whitespace-nowrap">Da Fare</button>
+            <button onclick="setFilter('IN_PROGRESS')" id="filter-IN_PROGRESS" class="tab-btn pb-2.5 px-1 text-sm text-textMuted hover:text-textMain transition-colors whitespace-nowrap">In Corso</button>
+            <button onclick="setFilter('DONE')" id="filter-DONE" class="tab-btn pb-2.5 px-1 text-sm text-textMuted hover:text-textMain transition-colors whitespace-nowrap">Completati</button>
+            <button onclick="setFilter('CANCELLED')" id="filter-CANCELLED" class="tab-btn pb-2.5 px-1 text-sm text-textMuted hover:text-textMain transition-colors whitespace-nowrap">Annullati</button>
         </div>
 
         <!-- Notification Area -->
         <div id="notification-area" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
 
         <!-- Task List Grid -->
-        <div id="loadingIndicator" class="flex justify-center items-center py-20 hidden">
-            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-purple-500"></i>
+        <div id="loadingIndicator" class="flex justify-center items-center py-12 hidden">
+            <i class="fa-solid fa-circle-notch fa-spin text-2xl text-textMuted"></i>
         </div>
         
-        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-gray-400 opacity-70">
-            <i class="fa-solid fa-box-open text-6xl mb-4"></i>
-            <p class="text-xl">Nessun task trovato.</p>
-            <p class="text-sm mt-2">Crea un nuovo task o cambia i filtri.</p>
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-textMuted bg-white rounded-xl border border-borderLight border-dashed">
+            <i class="fa-regular fa-folder-open text-4xl mb-3 text-gray-300"></i>
+            <p class="text-base font-medium text-textMain">Nessuna attività trovata.</p>
+            <p class="text-sm mt-1">Modifica i filtri o premi "Crea" per iniziare.</p>
         </div>
 
-        <div id="taskGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
+        <div id="taskGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pb-12">
             <!-- Cards will be dynamically inserted here -->
         </div>
 

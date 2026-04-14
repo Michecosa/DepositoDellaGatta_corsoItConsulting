@@ -4,7 +4,7 @@ const API_URL = 'http://localhost:8080/todos';
 let tasks = [];
 let currentFilter = 'ALL';
 let searchQuery = '';
-let currentPriority = 1; // Default priorità alta
+let currentPriority = 1; // Default
 
 // DOM Elements
 const taskGrid = document.getElementById('taskGrid');
@@ -12,70 +12,79 @@ const loadingIndicator = document.getElementById('loadingIndicator');
 const emptyState = document.getElementById('emptyState');
 const searchInput = document.getElementById('searchInput');
 
-// Configuration for mapping states to UI
+// Monochrome icons for states
 const stateConfig = {
-    'TODO': { label: 'Da Fare', color: 'blue', icon: 'fa-circle', nextStates: ['IN_PROGRESS', 'CANCELLED'] },
-    'IN_PROGRESS': { label: 'In Corso', color: 'yellow', icon: 'fa-spinner fa-spin', nextStates: ['DONE', 'CANCELLED'] },
-    'DONE': { label: 'Completato', color: 'green', icon: 'fa-check-circle', nextStates: [] },
-    'CANCELLED': { label: 'Annullato', color: 'red', icon: 'fa-times-circle', nextStates: [] }
+    'TODO': { label: 'Da Fare', icon: 'fa-regular fa-circle text-gray-400' },
+    'IN_PROGRESS': { label: 'In Corso', icon: 'fa-solid fa-spinner fa-spin text-blue-500' },
+    'DONE': { label: 'Completato', icon: 'fa-regular fa-circle-check text-gray-400' },
+    'CANCELLED': { label: 'Annullato', icon: 'fa-regular fa-circle-xmark text-gray-400' }
 };
 
-// Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     fetchTasks();
+    setPriority(1);
     
-    // Auto search delay helper
     let debounceTimer;
     searchInput.addEventListener('input', (e) => {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             searchQuery = e.target.value.trim();
-            fetchTasks(); // Fetch with query to use backend filtering
-        }, 400);
+            fetchTasks();
+        }, 300);
     });
 });
 
-// Show Notification
+function setPriority(prio) {
+    if (prio < 1 || prio > 3) return;
+    currentPriority = prio;
+    
+    for (let i = 1; i <= 3; i++) {
+        const btn = document.getElementById(`prio-${i}`);
+        if(btn) {
+            btn.className = "w-8 h-8 rounded-md flex items-center justify-center font-medium text-sm text-textMuted border border-borderLight bg-white hover:bg-gray-50 hover:text-textMain transition-colors focus:outline-none";
+        }
+    }
+    
+    const activeBtn = document.getElementById(`prio-${prio}`);
+    if(activeBtn) {
+        activeBtn.className = "w-8 h-8 rounded-md flex items-center justify-center font-medium text-sm text-white bg-primary border border-primary shadow-sm transition-colors focus:outline-none";
+    }
+}
+
 function showNotification(message, type = 'success') {
     const container = document.getElementById('notification-area');
     const note = document.createElement('div');
     
-    // Setup colors based on type
-    const bgClass = type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-200' : 'bg-red-500/20 border-red-500/50 text-red-200';
-    const iconClass = type === 'success' ? 'fa-check' : 'fa-exclamation-triangle';
+    const bgClass = 'bg-white border-borderLight text-textMain';
+    const iconClass = type === 'success' ? 'fa-check text-green-500' : 'fa-triangle-exclamation text-red-500';
     
-    note.className = `glass-card border px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 notification-enter ${bgClass}`;
+    note.className = `border px-4 py-3 rounded-lg shadow-md flex items-center gap-3 notification-enter ${bgClass}`;
     note.innerHTML = `
-        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-            <i class="fa-solid ${iconClass}"></i>
-        </div>
+        <i class="fa-solid ${iconClass}"></i>
         <p class="text-sm font-medium pr-2">${message}</p>
     `;
     
     container.appendChild(note);
     
-    // Auto remove
     setTimeout(() => {
         note.classList.replace('notification-enter', 'notification-exit');
         setTimeout(() => note.remove(), 300);
-    }, 4000);
+    }, 3000);
 }
 
-// Set Filter
 function setFilter(filter) {
     currentFilter = filter;
     
-    // Update UI for buttons
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('tab-active');
     });
-    document.getElementById(`filter-${filter}`).classList.add('active');
     
-    // Re-fetch with backend filter if possible, or filter frontend
+    const activeTab = document.getElementById(`filter-${filter}`);
+    if(activeTab) activeTab.classList.add('tab-active');
+    
     fetchTasks();
 }
 
-// Fetch Tasks
 async function fetchTasks() {
     try {
         setLoading(true);
@@ -83,89 +92,56 @@ async function fetchTasks() {
         let url = API_URL;
         const params = new URLSearchParams();
         
-        if (currentFilter !== 'ALL') {
-            params.append('stato', currentFilter);
-        }
-        if (searchQuery !== '') {
-            params.append('search', searchQuery);
-        }
+        if (currentFilter !== 'ALL') params.append('stato', currentFilter);
+        if (searchQuery !== '') params.append('search', searchQuery);
         
-        if (params.toString()) {
-            url += `?${params.toString()}`;
-        }
+        if (params.toString()) url += `?${params.toString()}`;
 
         const response = await axios.get(url);
         tasks = response.data;
         
         renderTasks();
     } catch (error) {
-        console.error("Error fetching tasks:", error);
-        showNotification("Impossibile caricare i task. Verifica che il server sia acceso.", "error");
+        console.error("Fetch error:", error);
+        showNotification("Errore nel caricamento task", "error");
     } finally {
         setLoading(false);
     }
 }
 
-// Priority toggle logic
-function setPriority(prio) {
-    if (prio < 1 || prio > 3) return;
-    currentPriority = prio;
-    
-    // Reset di tutti i bottoni
-    for (let i = 1; i <= 3; i++) {
-        const btn = document.getElementById(`prio-${i}`);
-        if(btn) {
-            btn.className = "w-10 h-10 rounded-lg flex items-center justify-center font-bold text-gray-400 hover:bg-white/10 transition-all focus:outline-none";
-        }
-    }
-    
-    // Evidenzia il bottone selezionato (intuitivo)
-    const activeBtn = document.getElementById(`prio-${prio}`);
-    if(activeBtn) {
-        activeBtn.className = "w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white bg-purple-600 shadow-md shadow-purple-500/20 transition-all focus:outline-none scale-110";
-    }
-}
-
-// Create Task
 async function createTask() {
     const descInput = document.getElementById('newTaskDesc');
-    
     const desc = descInput.value.trim();
-    const prio = currentPriority;
     
     if (!desc) {
-        showNotification("Inserisci una descrizione per il task.", "error");
+        showNotification("Inserisci la descrizione", "error");
         return;
     }
     
     try {
-        const response = await axios.post(API_URL, {
+        await axios.post(API_URL, {
             descrizione: desc,
-            priorita: prio
+            priorita: currentPriority
         });
         
         descInput.value = '';
-        setPriority(1); // Reset to default
-        
-        showNotification("Task creato con successo!");
-        
-        // If the current filter excludes TODOs, user might not see it, usually better to fetch all
+        setPriority(1);
         fetchTasks();
+        showNotification("Task aggiunto");
     } catch (error) {
-        console.error("Creation error:", error);
-        showNotification("Errore durante la creazione del task.", "error");
+        console.error("Create error:", error);
+        showNotification("Errore elaborazione richiesta", "error");
     }
 }
 
-// Update Task Status
 async function updateTaskStatus(id, newStatus) {
     try {
-        const taskToUpdate = tasks.find(t => t.id === id);
-        if (!taskToUpdate) return;
+        const currentTask = tasks.find(t => t.id === id);
+        if(!currentTask) return;
         
         const response = await axios.put(`${API_URL}/${id}`, {
-            descrizione: taskToUpdate.descrizione,
-            priorita: taskToUpdate.priorita,
+            descrizione: currentTask.descrizione,
+            priorita: currentTask.priorita,
             stato: newStatus
         });
         
@@ -174,29 +150,25 @@ async function updateTaskStatus(id, newStatus) {
              return;
         }
 
-        showNotification(`Task spostato in ${stateConfig[newStatus].label}`);
         fetchTasks();
     } catch (error) {
         console.error("Update error:", error);
-        showNotification("Errore durante l'aggiornamento.", "error");
+        showNotification("Errore aggiornamento", "error");
     }
 }
 
-// Delete Task
 async function deleteTask(id) {
-    if (!confirm("Sei sicuro di voler eliminare questo task?")) return;
+    if (!confirm("Sicuro di voler eliminare?")) return;
     
     try {
         await axios.delete(`${API_URL}/${id}`);
-        showNotification("Task eliminato permanentemente.");
         fetchTasks();
     } catch (error) {
         console.error("Delete error:", error);
-        showNotification("Errore durante l'eliminazione.", "error");
+        showNotification("Errore eliminazione", "error");
     }
 }
 
-// UI Helpers
 function setLoading(isLoading) {
     if (isLoading) {
         loadingIndicator.classList.remove('hidden');
@@ -217,102 +189,62 @@ function setLoading(isLoading) {
     }
 }
 
-function getPriorityBadge(priority) {
-    let colorClass = 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-    if (priority === 1) colorClass = 'bg-red-500/20 text-red-400 border-red-500/30';
-    else if (priority === 2) colorClass = 'bg-orange-500/20 text-orange-400 border-orange-500/30';
-    else if (priority === 3) colorClass = 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-    
-    return `<span class="px-2 py-0.5 rounded text-xs font-medium border ${colorClass}">Prio ${priority}</span>`;
-}
-
 function renderTasks() {
     taskGrid.innerHTML = '';
     
-    tasks.forEach((task, index) => {
-        const stateConf = stateConfig[task.stato];
-        
-        // Define color classes based on state
-        const colorTitle = `text-${stateConf.color}-400`;
-        const borderCard = `border-${stateConf.color}-500/30`;
+    tasks.forEach((task) => {
+        const stateInfo = stateConfig[task.stato];
+        const isCompletedOrCancelled = task.stato === 'DONE' || task.stato === 'CANCELLED';
         
         const card = document.createElement('div');
-        card.className = `glass-card task-card p-5 rounded-2xl border ${borderCard} flex flex-col h-full opacity-0 animate-slide-up relative overflow-hidden group`;
-        card.style.animationDelay = `${index * 0.05}s`;
+        card.className = `task-card p-5 rounded-xl flex flex-col h-full relative group ${isCompletedOrCancelled ? 'opacity-60 bg-gray-50' : 'bg-white'}`;
         
-        // Subtle background glow based on state
-        const glowColor = {
-            'blue': 'from-blue-500/5',
-            'yellow': 'from-yellow-500/5',
-            'green': 'from-green-500/5',
-            'red': 'from-red-500/5'
-        }[stateConf.color];
-        
-        // Build Action Buttons
+        // Actions
         let actionButtonsHtml = '';
         
         if (task.stato === 'TODO') {
-            actionButtonsHtml += `
-                <button onclick="updateTaskStatus(${task.id}, 'IN_PROGRESS')" class="flex-1 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-xl py-2 px-3 text-sm font-medium transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play text-xs"></i> Inizia
-                </button>
-            `;
+            actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'IN_PROGRESS')" class="text-textMuted hover:text-primary transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-blue-50 flex items-center gap-1.5"><i class="fa-solid fa-play text-xs opacity-70"></i> Inizia</button>`;
         } else if (task.stato === 'IN_PROGRESS') {
-            actionButtonsHtml += `
-                <button onclick="updateTaskStatus(${task.id}, 'DONE')" class="flex-1 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 rounded-xl py-2 px-3 text-sm font-medium transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-check text-xs"></i> Fatto
-                </button>
-            `;
+            actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'DONE')" class="text-textMuted hover:text-green-600 transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-green-50 flex items-center gap-1.5"><i class="fa-solid fa-check text-xs opacity-70"></i> Fatto</button>`;
         }
         
         if (task.stato === 'TODO' || task.stato === 'IN_PROGRESS') {
-             actionButtonsHtml += `
-                <button onclick="updateTaskStatus(${task.id}, 'CANCELLED')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl py-2 px-3 text-sm font-medium transition-all" title="Annulla">
-                    <i class="fa-solid fa-ban"></i>
-                </button>
-            `;
+             actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'CANCELLED')" class="text-textMuted hover:text-textMain transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-gray-100 flex items-center gap-1.5" title="Annulla"><i class="fa-solid fa-ban text-xs opacity-70"></i> Annulla</button>`;
         }
 
-        // Delete is always possible via API, hide until hover unless finished
-        const deleteClass = (task.stato === 'DONE' || task.stato === 'CANCELLED') 
-            ? 'flex-1 bg-gray-500/10 hover:bg-red-500/20 hover:text-red-400 border border-gray-500/30 hover:border-red-500/30 text-gray-400 rounded-xl py-2 px-3 text-sm font-medium transition-all flex items-center justify-center gap-2'
-            : 'absolute top-4 right-4 text-gray-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100';
-
-        let deleteBtnHtml = `
-            <button onclick="deleteTask(${task.id})" class="${deleteClass}" title="Elimina Task">
-                <i class="fa-regular fa-trash-can"></i> ${(task.stato === 'DONE' || task.stato === 'CANCELLED') ? 'Elimina' : ''}
-            </button>
-        `;
+        const deleteBtn = `<button onclick="deleteTask(${task.id})" class="text-textMuted hover:text-red-500 transition-colors py-1 px-2 rounded hover:bg-red-50" title="Elimina"><i class="fa-regular fa-trash-can opacity-80"></i></button>`;
         
         let bottomActions = '';
-        if (actionButtonsHtml || (task.stato === 'DONE' || task.stato === 'CANCELLED')) {
+        if (actionButtonsHtml || isCompletedOrCancelled) {
              bottomActions = `
-                <div class="mt-auto pt-4 flex gap-2">
-                    ${actionButtonsHtml}
-                    ${(task.stato === 'DONE' || task.stato === 'CANCELLED') ? deleteBtnHtml : ''}
+                <div class="mt-4 pt-3 border-t border-borderLight flex justify-between items-center gap-2">
+                    <div class="flex gap-0.5">${actionButtonsHtml}</div>
+                    ${deleteBtn}
+                </div>
+             `;
+        } else {
+             bottomActions = `
+                <div class="mt-4 pt-3 border-t border-borderLight flex justify-end items-center gap-2">
+                    ${deleteBtn}
                 </div>
              `;
         }
 
+        let strikeClass = isCompletedOrCancelled ? 'line-through text-textMuted' : 'text-textMain';
+
         card.innerHTML = `
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${glowColor} to-transparent rounded-bl-full pointer-events-none"></div>
-            
-            ${(task.stato !== 'DONE' && task.stato !== 'CANCELLED') ? deleteBtnHtml : ''}
-            
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 rounded-full bg-${stateConf.color}-500/20 flex items-center justify-center text-${stateConf.color}-400">
-                    <i class="fa-solid ${stateConf.icon}"></i>
-                </div>
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-400 font-medium tracking-wider uppercase">${stateConf.label}</span>
-                    <span class="text-xs text-gray-500">ID: #${task.id}</span>
-                </div>
+            <div class="flex items-center gap-2 mb-3 text-textMuted">
+                <i class="${stateInfo.icon} text-sm"></i>
+                <span class="text-[11px] font-semibold uppercase tracking-wider">${stateInfo.label}</span>
+                <span class="text-xs ml-auto">#${task.id}</span>
             </div>
             
-            <h3 class="text-lg font-medium text-white mb-4 pr-6 leading-tight flex-grow">${task.descrizione}</h3>
+            <h3 class="${strikeClass} text-base font-medium leading-snug flex-grow mb-4 break-words pl-1 border-l-2 border-transparent group-hover:border-primary transition-all">${task.descrizione}</h3>
             
-            <div class="flex items-center gap-2 mb-2">
-                ${getPriorityBadge(task.priorita)}
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5 text-textMuted text-xs font-medium bg-bglight px-2 py-1 rounded border border-borderLight w-fit">
+                    <i class="fa-solid fa-flag text-[10px] opacity-70"></i> Priorità ${task.priorita}
+                </div>
             </div>
             
             ${bottomActions}

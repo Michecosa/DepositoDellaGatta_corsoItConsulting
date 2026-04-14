@@ -1,76 +1,51 @@
-/* Custom Tailwind setup with Glassmorphism Base Styles */
+/* Minimal Pro Styles */
 body {
-    background-color: #0f172a;
-    background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 70%);
-}
-
-.glass-card {
-    background: rgba(30, 41, 59, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.glass-header {
-    background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background-color: #F9FAFB;
+    color: #1F2937;
+    font-family: 'Inter', sans-serif;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: #4f46e5;
-    border-radius: 4px;
+    background: #E5E7EB;
+    border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #6366f1;
+    background: #D1D5DB;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
     height: 4px;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-}
 
-/* Card hover animation */
+/* Minimal Card and Hover */
 .task-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease-in-out;
+    background: #ffffff;
+    border: 1px solid #E5E7EB; /* gray-200 */
 }
 .task-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-    border-color: rgba(139, 92, 246, 0.3);
+    border-color: #D1D5DB; /* gray-300 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
+    transform: translateY(-1px);
 }
 
 /* Notification animation */
 @keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes slideOutRight {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(100%);
-        opacity: 0;
-    }
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
 }
 
 .notification-enter {
@@ -81,9 +56,9 @@ body {
     animation: slideOutRight 0.3s forwards ease-in;
 }
 
-/* Active filter state */
-.filter-btn.active {
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.5);
-    color: white;
+/* Tab Active State */
+.tab-active {
+    color: #1F2937 !important;
+    font-weight: 500;
+    border-bottom: 2px solid #3B82F6;
 }
