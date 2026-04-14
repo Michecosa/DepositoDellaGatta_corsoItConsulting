@@ -38,8 +38,8 @@ function setPriority(prio) {
     if (prio < 1 || prio > 3) return;
     currentPriority = prio;
     
-    const inactiveClass = "w-8 h-8 rounded-md flex items-center justify-center font-medium text-sm text-textMuted bg-white/40 hover:bg-white/60 border border-white/50 backdrop-blur-sm transition-all focus:outline-none";
-    const activeClass = "w-8 h-8 rounded-md flex items-center justify-center font-bold text-primary bg-white/80 border border-white/80 shadow-md backdrop-blur-md transition-all focus:outline-none scale-105";
+    const inactiveClass = "xp-button xp-button-classic";
+    const activeClass = "xp-button xp-button-classic xp-inset bg-[#cfcbd6] font-bold";
 
     for (let i = 1; i <= 3; i++) {
         const btn = document.getElementById(`prio-${i}`);
@@ -48,40 +48,90 @@ function setPriority(prio) {
     
     const activeBtn = document.getElementById(`prio-${prio}`);
     if(activeBtn) activeBtn.className = activeClass;
-    
-    // Nessuna variazione dinamica al bottone Crea (rimane quello standard HTML)
+}
+
+function showXPDialog(message, type = 'confirm') {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'xp-modal-overlay';
+        
+        const dialog = document.createElement('div');
+        dialog.className = 'xp-dialog';
+        
+        const icon = type === 'confirm' ? 'fa-circle-question' : 'fa-circle-info';
+        const titleText = type === 'confirm' ? 'Confirm' : 'Information';
+        
+        dialog.innerHTML = `
+            <div class="xp-title-bar">
+                <div class="xp-title-text">${titleText}</div>
+                <div class="xp-close-btn" id="dialogClose">✕</div>
+            </div>
+            <div class="xp-dialog-body">
+                <div class="xp-dialog-icon">
+                    <i class="fa-solid ${icon}"></i>
+                </div>
+                <div class="xp-dialog-message">${message}</div>
+            </div>
+            <div class="xp-dialog-footer">
+                <button class="xp-button xp-button-classic xp-dialog-btn" id="dialogOk">OK</button>
+                ${type === 'confirm' ? '<button class="xp-button xp-button-classic xp-dialog-btn" id="dialogCancel">Annulla</button>' : ''}
+            </div>
+        `;
+        
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        
+        const close = (val) => {
+            overlay.remove();
+            resolve(val);
+        };
+        
+        document.getElementById('dialogOk').onclick = () => close(true);
+        if (type === 'confirm') {
+            document.getElementById('dialogCancel').onclick = () => close(false);
+        }
+        document.getElementById('dialogClose').onclick = () => close(false);
+    });
 }
 
 function showNotification(message, type = 'success') {
     const container = document.getElementById('notification-area');
     const note = document.createElement('div');
     
-    const bgClass = 'bg-white/70 backdrop-blur-md border-white/50 text-textMain';
-    const iconClass = type === 'success' ? 'fa-check text-green-500' : 'fa-triangle-exclamation text-red-500';
+    const iconClass = type === 'success' ? 'fa-circle-info text-blue-600' : 'fa-triangle-exclamation text-red-600';
+    const title = type === 'success' ? 'TaskMaster Pro' : 'Attenzione';
     
-    note.className = `border px-4 py-3 rounded-lg shadow-lg shadow-gray-200/50 flex items-center gap-3 notification-enter ${bgClass}`;
+    note.className = `xp-balloon notification-enter`;
     note.innerHTML = `
-        <i class="fa-solid ${iconClass}"></i>
-        <p class="text-sm font-medium pr-2">${message}</p>
+        <div class="xp-balloon-inner">
+            <div class="xp-balloon-close" onclick="this.parentElement.parentElement.remove()">✕</div>
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid ${iconClass}"></i>
+                <span class="font-bold">${title}</span>
+            </div>
+            <p>${message}</p>
+        </div>
     `;
     
     container.appendChild(note);
     
     setTimeout(() => {
-        note.classList.replace('notification-enter', 'notification-exit');
-        setTimeout(() => note.remove(), 300);
-    }, 3000);
+        if(note.parentElement) {
+            note.classList.add('notification-exit');
+            setTimeout(() => note.remove(), 300);
+        }
+    }, 5000);
 }
 
 function setFilter(filter) {
     currentFilter = filter;
     
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('tab-active');
+    document.querySelectorAll('.xp-tab').forEach(btn => {
+        btn.classList.remove('xp-tab-active');
     });
     
     const activeTab = document.getElementById(`filter-${filter}`);
-    if(activeTab) activeTab.classList.add('tab-active');
+    if(activeTab) activeTab.classList.add('xp-tab-active');
     
     fetchTasks();
 }
@@ -159,7 +209,8 @@ async function updateTaskStatus(id, newStatus) {
 }
 
 async function deleteTask(id) {
-    if (!confirm("Sicuro di voler eliminare?")) return;
+    const confirmed = await showXPDialog("Sicuro di voler eliminare questo task?");
+    if (!confirmed) return;
     
     try {
         await axios.delete(`${API_URL}/${id}`);
@@ -198,60 +249,55 @@ function renderTasks() {
         const isCompletedOrCancelled = task.stato === 'DONE' || task.stato === 'CANCELLED';
         
         const card = document.createElement('div');
-        // Glassmorphism base classes
-        const baseClasses = "task-card p-5 rounded-b-xl flex flex-col h-full relative group bg-white/50 backdrop-blur-lg border border-white/60 shadow-lg shadow-blue-500/5 hover:bg-white/70 hover:-translate-y-1";
-        
-        card.className = isCompletedOrCancelled ? `${baseClasses} opacity-60` : baseClasses;
+        card.className = "task-card-xp xp-outset shadow-sm";
+        if (isCompletedOrCancelled) card.style.opacity = "0.7";
         
         // Actions
         let actionButtonsHtml = '';
         
         if (task.stato === 'TODO') {
-            actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'IN_PROGRESS')" class="text-textMuted hover:text-primary transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-white/60 backdrop-blur-sm flex items-center gap-1.5"><i class="fa-solid fa-play text-xs opacity-70"></i> Inizia</button>`;
+            actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'IN_PROGRESS')" class="xp-button xp-button-classic text-[13px] py-1 px-3"><i class="fa-solid fa-play scale-75"></i> Vai</button>`;
         } else if (task.stato === 'IN_PROGRESS') {
-            actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'DONE')" class="text-textMuted hover:text-green-600 transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-white/60 backdrop-blur-sm flex items-center gap-1.5"><i class="fa-solid fa-check text-xs opacity-70"></i> Fatto</button>`;
+            actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'DONE')" class="xp-button xp-button-classic text-[13px] py-1 px-3 text-green-700 font-bold"><i class="fa-solid fa-check scale-75"></i> OK</button>`;
         }
         
         if (task.stato === 'TODO' || task.stato === 'IN_PROGRESS') {
-             actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'CANCELLED')" class="text-textMuted hover:text-textMain transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-white/60 backdrop-blur-sm flex items-center gap-1.5" title="Annulla"><i class="fa-solid fa-ban text-xs opacity-70"></i> Annulla</button>`;
+             actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'CANCELLED')" class="xp-button xp-button-classic text-[13px] py-1 px-3" title="Annulla"><i class="fa-solid fa-ban scale-75"></i> No</button>`;
         }
 
-        const deleteBtn = `<button onclick="deleteTask(${task.id})" class="text-textMuted hover:text-red-500 transition-colors py-1 px-2 rounded hover:bg-white/60 backdrop-blur-sm" title="Elimina"><i class="fa-regular fa-trash-can opacity-80"></i></button>`;
+        const deleteBtn = `<button onclick="deleteTask(${task.id})" class="xp-button xp-button-classic text-[13px] py-1 px-3 ml-auto" title="Elimina"><i class="fa-regular fa-trash-can scale-75 text-red-600"></i></button>`;
         
-        let bottomActions = '';
-        if (actionButtonsHtml || isCompletedOrCancelled) {
-             bottomActions = `
-                <div class="mt-4 pt-3 border-t border-white/50 flex justify-between items-center gap-2">
-                    <div class="flex gap-0.5">${actionButtonsHtml}</div>
-                    ${deleteBtn}
-                </div>
-             `;
-        } else {
-             bottomActions = `
-                <div class="mt-4 pt-3 border-t border-white/50 flex justify-end items-center gap-2">
-                    ${deleteBtn}
-                </div>
-             `;
-        }
+        let strikeClass = isCompletedOrCancelled ? 'line-through text-gray-500' : 'text-black';
 
-        let strikeClass = isCompletedOrCancelled ? 'line-through text-textMuted' : 'text-textMain';
-
-        let neonLine = '';
-        if (task.priorita === 1) neonLine = '<div class="absolute top-0 left-0 w-full h-[2px] bg-red-500/60 z-10"></div>';
-        else if (task.priorita === 2) neonLine = '<div class="absolute top-0 left-0 w-full h-[2px] bg-orange-500/60 z-10"></div>';
-        else neonLine = '<div class="absolute top-0 left-0 w-full h-[2px] bg-teal-500/50 z-10"></div>';
+        // Priority Banner Label
+        let prioLabel = '';
+        let prioBorderColor = '';
+        if (task.priorita === 1) { prioLabel = 'ALTA'; prioBorderColor = '#ff0000'; }
+        else if (task.priorita === 2) { prioLabel = 'MEDIA'; prioBorderColor = '#ff9900'; }
+        else { prioLabel = 'BASSA'; prioBorderColor = '#008000'; }
 
         card.innerHTML = `
-            ${neonLine}
-            <div class="flex items-center gap-2 mb-3 text-textMuted pt-1">
-                <i class="${stateInfo.icon} text-sm"></i>
-                <span class="text-[11px] font-semibold uppercase tracking-wider">${stateInfo.label}</span>
-                <span class="text-xs ml-auto font-mono text-gray-400">#${task.id}</span>
+            <div class="task-card-title flex justify-between items-center px-2 py-1">
+                <span class="text-[12px]">Task #${task.id}</span>
+                <span class="text-[12px] uppercase font-bold text-white/90">${stateInfo.label}</span>
             </div>
-            
-            <h3 class="${strikeClass} text-base font-medium leading-snug flex-grow mb-1 break-words pl-1 border-l-2 border-transparent group-hover:border-primary/50 transition-all">${task.descrizione}</h3>
-            
-            ${bottomActions}
+            <div class="p-4 flex-grow flex flex-col bg-white">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2 text-gray-600">
+                        <i class="${stateInfo.icon} text-base"></i>
+                    </div>
+                    <span class="text-[12px] font-bold px-1.5 py-0.5 border" style="color: ${prioBorderColor}; border-color: ${prioBorderColor}">PRIORITÀ: ${prioLabel}</span>
+                </div>
+                
+                <h3 class="${strikeClass} task-desc-xp break-words mb-6">${task.descrizione}</h3>
+                
+                <div class="mt-auto pt-3 border-t border-gray-100 flex items-center gap-2">
+                    <div class="flex gap-1">
+                        ${actionButtonsHtml}
+                    </div>
+                    ${deleteBtn}
+                </div>
+            </div>
         `;
         
         taskGrid.appendChild(card);
