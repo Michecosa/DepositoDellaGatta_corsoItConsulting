@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080', // Assicurati che l'API Spring Boot esponga qui i suoi endpoint
+  baseURL: 'http://localhost:8080',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-export const getUtenti = () => api.get('/utenti'); // Endpoint fittizio o reale (verifica nel controller)
-export const getTodosByUtente = (utenteId) => api.get(`/utenti/${utenteId}/todo`); // O altro parametro a seconda dell'implementazione
+export const getUtenti = () => api.get('/utenti');
+export const getTodosByUtente = (utenteId) => api.get(`/utenti/${utenteId}/todo`);
 export const getTodos = () => api.get('/todo'); 
 export const createTodo = (todo) => api.post('/todo', todo);
 export const updateTodo = (id, todo) => api.put(`/todo/${id}`, todo);
