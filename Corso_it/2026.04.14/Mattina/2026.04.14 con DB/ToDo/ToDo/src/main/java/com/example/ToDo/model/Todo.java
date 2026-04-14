@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -26,6 +28,7 @@ public class Todo {
   @Size(min = 3, message = "La descrizione deve avere almeno 3 caratteri")
   private String descrizione;
 
+  @Enumerated(EnumType.STRING)
   private StatoTask stato;
 
   @NotNull(message = "La priorità non può essere nulla")
