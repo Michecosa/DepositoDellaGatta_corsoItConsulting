@@ -37,7 +37,7 @@ public class TodoController {
     public Todo updateTodo(@PathVariable Long id, @RequestBody Todo modificato) {
         Todo esistente = todoService.findById(id);
         esistente.setDescrizione(modificato.getDescrizione());
-        esistente.setCompletato(modificato.isCompletato());
+        esistente.setCompletato(modificato.getCompletato());
         return todoService.save(esistente);
     }
 
