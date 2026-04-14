@@ -199,7 +199,7 @@ function renderTasks() {
         
         const card = document.createElement('div');
         // Glassmorphism base classes
-        const baseClasses = "task-card p-5 rounded-xl flex flex-col h-full relative group bg-white/50 backdrop-blur-lg border border-white/60 shadow-lg shadow-blue-500/5 hover:bg-white/70 hover:-translate-y-1";
+        const baseClasses = "task-card p-5 rounded-b-xl flex flex-col h-full relative group bg-white/50 backdrop-blur-lg border border-white/60 shadow-lg shadow-blue-500/5 hover:bg-white/70 hover:-translate-y-1";
         
         card.className = isCompletedOrCancelled ? `${baseClasses} opacity-60` : baseClasses;
         
@@ -236,20 +236,20 @@ function renderTasks() {
 
         let strikeClass = isCompletedOrCancelled ? 'line-through text-textMuted' : 'text-textMain';
 
+        let neonLine = '';
+        if (task.priorita === 1) neonLine = '<div class="absolute top-0 left-0 w-full h-[2px] bg-red-500/60 z-10"></div>';
+        else if (task.priorita === 2) neonLine = '<div class="absolute top-0 left-0 w-full h-[2px] bg-orange-500/60 z-10"></div>';
+        else neonLine = '<div class="absolute top-0 left-0 w-full h-[2px] bg-teal-500/50 z-10"></div>';
+
         card.innerHTML = `
-            <div class="flex items-center gap-2 mb-3 text-textMuted">
+            ${neonLine}
+            <div class="flex items-center gap-2 mb-3 text-textMuted pt-1">
                 <i class="${stateInfo.icon} text-sm"></i>
                 <span class="text-[11px] font-semibold uppercase tracking-wider">${stateInfo.label}</span>
                 <span class="text-xs ml-auto font-mono text-gray-400">#${task.id}</span>
             </div>
             
-            <h3 class="${strikeClass} text-base font-medium leading-snug flex-grow mb-4 break-words pl-1 border-l-2 border-transparent group-hover:border-primary/50 transition-all">${task.descrizione}</h3>
-            
-            <div class="flex items-center gap-3">
-                <div class="flex items-center gap-1.5 text-textMuted text-xs font-medium bg-white/40 backdrop-blur-sm px-2 py-1 rounded border border-white/60 shadow-sm w-fit">
-                    <i class="fa-solid fa-flag text-[10px] opacity-70"></i> Prio ${task.priorita}
-                </div>
-            </div>
+            <h3 class="${strikeClass} text-base font-medium leading-snug flex-grow mb-1 break-words pl-1 border-l-2 border-transparent group-hover:border-primary/50 transition-all">${task.descrizione}</h3>
             
             ${bottomActions}
         `;
