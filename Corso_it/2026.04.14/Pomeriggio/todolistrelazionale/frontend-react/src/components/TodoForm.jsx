@@ -30,7 +30,7 @@ const TodoForm = ({ onTodoCreated, utenteId }) => {
       // Backend: Crea un task associandolo potenzialmente all'utente
       // (Dipende da come il backend mappa l'utente, passiamo utenteId se richiesto)
       const newTodo = { descrizione, completato: false, utente: { id: utenteId } };
-      const response = await api.post('/todos', newTodo);
+      const response = await api.post('/todo', newTodo);
       onTodoCreated(response.data);
       setDescrizione('');
     } catch (err) {

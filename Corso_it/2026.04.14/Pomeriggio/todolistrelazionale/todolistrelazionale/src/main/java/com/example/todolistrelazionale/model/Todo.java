@@ -2,7 +2,7 @@ package com.example.todolistrelazionale.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,11 +22,11 @@ public class Todo {
   @Column(nullable = false)
   private String descrizione;
 
-  private boolean completato;
+  private Boolean completato;
 
   @ManyToOne
   @JoinColumn(name = "utente_id", nullable = false)
-  @JsonIgnore
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private Utente utente;
 
   @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)

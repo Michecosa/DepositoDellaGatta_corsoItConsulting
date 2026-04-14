@@ -11,7 +11,7 @@ const TodoItem = ({ todo, onUpdate, onDelete }) => {
       setIsToggling(true);
       // PUT per aggiornare stato
       const updatedTodo = { ...todo, completato: !todo.completato };
-      await api.put(`/todos/${todo.id}`, updatedTodo);
+      await api.put(`/todo/${todo.id}`, updatedTodo);
       onUpdate(updatedTodo);
     } catch (err) {
       console.error("Errore nell'aggiornamento del todo", err);
@@ -24,7 +24,7 @@ const TodoItem = ({ todo, onUpdate, onDelete }) => {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await api.delete(`/todos/${todo.id}`);
+      await api.delete(`/todo/${todo.id}`);
       onDelete(todo.id);
     } catch (err) {
       console.error("Errore nell'eliminazione del todo", err);

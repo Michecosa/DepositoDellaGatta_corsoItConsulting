@@ -19,18 +19,8 @@ const TodoList = ({ selectedUser }) => {
   const fetchTodos = async () => {
     try {
       setLoading(true);
-      // Puoi usare getTodosByUtente se disponibile backend
-      // o prenderli tutti se esposti in GET /api/todos per filtrare lato client.
-      // Esempio per recuperare quelli del backend
-      const res = await api.get('/todos');
-      // Filtraggio lato client temporaneo:
-      // Se il backend non ha l'endpoint personalizzato per lo stream dell'utente.
-      const filteredTodos = res.data.filter(t => t.utente && t.utente.id === selectedUser.id);
-      
-      // In alternativa, colpisci l'endpoint specifico se esiste:
-      // const res = await api.get(`/utenti/${selectedUser.id}/todos`);
-      
-      setTodos(filteredTodos);
+      const res = await api.get(`/utenti/${selectedUser.id}/todo`);
+      setTodos(res.data);
       setError(null);
     } catch (err) {
       setError("Impossibile caricare i task.");
@@ -53,25 +43,13 @@ const TodoList = ({ selectedUser }) => {
     setTodos(todos.filter(t => t.id !== deletedId));
   };
 
-  // Funzione finta per simulare l'endpoint /api/todos/cerca?testo=...
-  const handleSearch = async (e) => {
-    const text = e.target.value;
-    setSearchQuery(text);
-    if(text === '') {
-      fetchTodos();
-      return;
-    }
-    // Proviamo a colpire l'API se il testo supera i 2 caratteri
-    if (text.length > 2) {
-      try {
-        const res = await api.get(`/todos/cerca?testo=${text}`);
-        const searchedTodos = res.data.filter(t => t.utente && t.utente.id === selectedUser.id);
-        setTodos(searchedTodos);
-      } catch (err) {
-        console.error("Errore ricerca", err);
-      }
-    }
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
   };
+
+  const displayedTodos = todos.filter(t => 
+    t.descrizione.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (!selectedUser) {
     return (
@@ -116,7 +94,7 @@ const TodoList = ({ selectedUser }) => {
           </div>
         ) : error ? (
            <p className="text-red-500 text-center">{error}</p>
-        ) : todos.length === 0 ? (
+        ) : displayedTodos.length === 0 ? (
            <div className="text-center py-12 px-4 rounded-xl border border-dashed border-slate-300 bg-white">
              <ListTodo size={32} className="mx-auto text-slate-300 mb-3" />
              <p className="text-slate-500 font-medium">Non ci sono task.</p>
@@ -124,7 +102,7 @@ const TodoList = ({ selectedUser }) => {
            </div>
         ) : (
           <div className="space-y-1">
-            {todos.map(todo => (
+            {displayedTodos.map(todo => (
               <TodoItem 
                 key={todo.id} 
                 todo={todo} 

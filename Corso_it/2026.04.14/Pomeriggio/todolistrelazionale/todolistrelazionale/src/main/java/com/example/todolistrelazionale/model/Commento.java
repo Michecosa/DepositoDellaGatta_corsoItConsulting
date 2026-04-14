@@ -1,6 +1,6 @@
 package com.example.todolistrelazionale.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +21,6 @@ public class Commento {
 
   @ManyToOne
   @JoinColumn(name = "todo_id", nullable = false)
-  @JsonIgnore
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private Todo todo;
 }
