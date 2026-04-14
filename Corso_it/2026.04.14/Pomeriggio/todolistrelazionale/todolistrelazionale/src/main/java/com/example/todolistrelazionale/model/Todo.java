@@ -2,6 +2,8 @@ package com.example.todolistrelazionale.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +26,7 @@ public class Todo {
 
   @ManyToOne
   @JoinColumn(name = "utente_id", nullable = false)
+  @JsonIgnore
   private Utente utente;
 
   @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)

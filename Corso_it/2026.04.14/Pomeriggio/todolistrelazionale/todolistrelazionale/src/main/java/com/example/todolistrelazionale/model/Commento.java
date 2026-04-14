@@ -1,5 +1,7 @@
 package com.example.todolistrelazionale.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,5 +21,6 @@ public class Commento {
 
   @ManyToOne
   @JoinColumn(name = "todo_id", nullable = false)
+  @JsonIgnore
   private Todo todo;
 }
