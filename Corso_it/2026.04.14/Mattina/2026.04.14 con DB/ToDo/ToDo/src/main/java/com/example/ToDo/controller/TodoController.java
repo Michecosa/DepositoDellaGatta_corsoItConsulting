@@ -1,6 +1,5 @@
 package com.example.ToDo.controller;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,22 +15,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import com.example.ToDo.model.StatoTask;
 import com.example.ToDo.model.Todo;
+import com.example.ToDo.service.ToDoService;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/todos")
 public class TodoController {
 
-  private final List<Todo> todos = new ArrayList<>();
-  private Long idCounter = 1L;
+  private final ToDoService service;
 
-  public TodoController() {
-    todos.add(new Todo(idCounter++, "Studiare Spring Boot", StatoTask.TODO, 2));
-    todos.add(new Todo(idCounter++, "Fare la spesa", StatoTask.IN_PROGRESS, 3));
-    todos.add(new Todo(idCounter++, "Chiamare il dentista", StatoTask.DONE, 1));
-    todos.add(new Todo(idCounter++, "Andare in palestra", StatoTask.TODO, 1));
+  public TodoController(ToDoService service) {
+    this.service = service;
   }
 
   // Restituisce tutti i todo, con filtri opzionali per stato e descrizione
@@ -40,39 +38,31 @@ public class TodoController {
       @RequestParam(required = false) StatoTask stato,
       @RequestParam(required = false) String search) {
 
-      return todos.stream()
+      return service.getAll().stream()
           .filter(t -> stato == null || t.getStato() == stato)
-          .filter(t -> search == null || t.getDescrizione().toLowerCase().contains(search.toLowerCase()))
-          .sorted(Comparator.comparingInt((Todo t) -> t.getPriorita())
-              .thenComparing(t -> t.getDescrizione()))
+          .filter(t -> search == null || (t.getDescrizione() != null && t.getDescrizione().toLowerCase().contains(search.toLowerCase())))
+          .sorted(Comparator.comparingInt((Todo t) -> t.getPriorita() != null ? t.getPriorita() : 3)
+              .thenComparing(t -> t.getDescrizione() != null ? t.getDescrizione() : ""))
           .collect(Collectors.toList());
   }
 
   // Restituisce un singolo todo per id
   @GetMapping("/{id}")
   public Todo getById(@PathVariable Long id) {
-    return todos.stream()
-        .filter(t -> t.getId().equals(id))
-        .findFirst()
-        .orElse(null);
+    return service.getById(id).orElse(null);
   }
 
   // Crea un nuovo todo, parte sempre da TODO
   @PostMapping
-  public Todo crea(@RequestBody Todo todo) {
-    todo.setId(idCounter++);
+  public Todo crea(@Valid @RequestBody Todo todo) {
     todo.setStato(StatoTask.TODO);
-    todos.add(todo);
-    return todo;
+    return service.create(todo);
   }
 
   // Aggiorna lo stato secondo il flusso permesso
   @PutMapping("/{id}")
-  public Object aggiornaStato(@PathVariable Long id, @RequestBody Todo aggiornato) {
-    Todo todo = todos.stream()
-        .filter(t -> t.getId().equals(id))
-        .findFirst()
-        .orElse(null);
+  public Object aggiornaStato(@PathVariable Long id, @Valid @RequestBody Todo aggiornato) {
+    Todo todo = service.getById(id).orElse(null);
 
     if (todo == null) return "Todo non trovato";
 
@@ -91,14 +81,13 @@ public class TodoController {
 
     if (!transitioneValida) return "Transizione di stato non consentita";
 
-    todo.setStato(statoNuovo);
-    return todo;
+    return service.update(id, aggiornato).orElse(null);
   }
 
   // Elimina un todo per id
   @DeleteMapping("/{id}")
   public String elimina(@PathVariable Long id) {
-    boolean rimosso = todos.removeIf(t -> t.getId().equals(id));
+    boolean rimosso = service.delete(id);
     return rimosso ? "Todo eliminato" : "Todo non trovato";
   }
 }
