@@ -4,6 +4,7 @@ const API_URL = 'http://localhost:8080/todos';
 let tasks = [];
 let currentFilter = 'ALL';
 let searchQuery = '';
+let currentPriority = 1; // Default priorità alta
 
 // DOM Elements
 const taskGrid = document.getElementById('taskGrid');
@@ -105,13 +106,32 @@ async function fetchTasks() {
     }
 }
 
+// Priority toggle logic
+function setPriority(prio) {
+    if (prio < 1 || prio > 3) return;
+    currentPriority = prio;
+    
+    // Reset di tutti i bottoni
+    for (let i = 1; i <= 3; i++) {
+        const btn = document.getElementById(`prio-${i}`);
+        if(btn) {
+            btn.className = "w-10 h-10 rounded-lg flex items-center justify-center font-bold text-gray-400 hover:bg-white/10 transition-all focus:outline-none";
+        }
+    }
+    
+    // Evidenzia il bottone selezionato (intuitivo)
+    const activeBtn = document.getElementById(`prio-${prio}`);
+    if(activeBtn) {
+        activeBtn.className = "w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white bg-purple-600 shadow-md shadow-purple-500/20 transition-all focus:outline-none scale-110";
+    }
+}
+
 // Create Task
 async function createTask() {
     const descInput = document.getElementById('newTaskDesc');
-    const prioInput = document.getElementById('newTaskPrio');
     
     const desc = descInput.value.trim();
-    const prio = parseInt(prioInput.value);
+    const prio = currentPriority;
     
     if (!desc) {
         showNotification("Inserisci una descrizione per il task.", "error");
@@ -125,7 +145,7 @@ async function createTask() {
         });
         
         descInput.value = '';
-        prioInput.value = '1';
+        setPriority(1); // Reset to default
         
         showNotification("Task creato con successo!");
         
@@ -140,9 +160,12 @@ async function createTask() {
 // Update Task Status
 async function updateTaskStatus(id, newStatus) {
     try {
-        // Find current task to send all required info, though just status might be enough based on controller,
-        // it expects a Todo object.
+        const taskToUpdate = tasks.find(t => t.id === id);
+        if (!taskToUpdate) return;
+        
         const response = await axios.put(`${API_URL}/${id}`, {
+            descrizione: taskToUpdate.descrizione,
+            priorita: taskToUpdate.priorita,
             stato: newStatus
         });
         
