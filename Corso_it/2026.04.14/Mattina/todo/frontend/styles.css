@@ -1,0 +1,89 @@
+/* Custom Tailwind setup with Glassmorphism Base Styles */
+body {
+    background-color: #0f172a;
+    background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 70%);
+}
+
+.glass-card {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-header {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+::-webkit-scrollbar-thumb {
+    background: #4f46e5;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #6366f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Card hover animation */
+.task-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.task-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+/* Notification animation */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.notification-enter {
+    animation: slideInRight 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.notification-exit {
+    animation: slideOutRight 0.3s forwards ease-in;
+}
+
+/* Active filter state */
+.filter-btn.active {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
+    color: white;
+}

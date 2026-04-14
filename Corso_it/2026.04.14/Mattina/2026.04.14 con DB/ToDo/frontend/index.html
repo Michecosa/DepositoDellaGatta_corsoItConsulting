@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster Pro - Advanced ToDo Management</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN per prototipazione veloce) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        darkBg: '#0f172a',
+                        cardGlass: 'rgba(30, 41, 59, 0.7)',
+                        accent: '#8b5cf6',
+                        accentHover: '#7c3aed',
+                        state: {
+                            TODO: '#3b82f6', // blue
+                            IN_PROGRESS: '#eab308', // yellow
+                            DONE: '#22c55e', // green
+                            CANCELLED: '#ef4444' // red
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'slide-up': 'slideUp 0.4s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- FontAwesome JS for Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- As an alternative, let's use a CDN for FontAwesome that doesn't require a kit -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-darkBg text-white min-h-screen relative overflow-x-hidden antialiased flex flex-col">
+
+    <!-- Ambient Background Effects -->
+    <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+    <!-- Header Section -->
+    <header class="w-full glass-header sticky top-0 z-50 border-b border-white/10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                    <i class="fa-solid fa-list-check text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 tracking-tight">TaskMaster Pro</h1>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="relative hidden md:block w-64">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Cerca task..." class="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-white placeholder-gray-400">
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 flex-grow flex flex-col z-10 animate-fade-in">
+        
+        <!-- Add Task Section -->
+        <section class="glass-card mb-10 py-6 px-8 rounded-2xl border border-white/10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row gap-6 items-center">
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 pointer-events-none"></div>
+            
+            <div class="w-full md:w-2/3 relative z-10 flex flex-col gap-2">
+                <h2 class="text-xl font-semibold mb-1">Crea Nuovo Task</h2>
+                <input type="text" id="newTaskDesc" placeholder="Cosa devi fare oggi?" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-white placeholder-gray-400 text-lg">
+            </div>
+            
+            <div class="w-full md:w-1/3 relative z-10 flex gap-4 items-end">
+                <div class="flex-grow">
+                    <label class="block text-sm text-gray-400 mb-2">Priorità (1 = max)</label>
+                    <input type="number" id="newTaskPrio" value="1" min="1" max="10" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-white">
+                </div>
+                <button onclick="createTask()" class="h-[52px] px-6 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Crea</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <div class="flex gap-3 mb-6 overflow-x-auto pb-4 custom-scrollbar">
+            <button onclick="setFilter('ALL')" id="filter-ALL" class="filter-btn active px-5 py-2 rounded-full border border-white/10 bg-white/10 text-sm font-medium transition-all hover:bg-white/20 whitespace-nowrap">Tutti i Task</button>
+            <button onclick="setFilter('TODO')" id="filter-TODO" class="filter-btn px-5 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium transition-all hover:bg-white/20 whitespace-nowrap flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-state-TODO"></span>Da Fare</button>
+            <button onclick="setFilter('IN_PROGRESS')" id="filter-IN_PROGRESS" class="filter-btn px-5 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium transition-all hover:bg-white/20 whitespace-nowrap flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-state-IN_PROGRESS"></span>In Corso</button>
+            <button onclick="setFilter('DONE')" id="filter-DONE" class="filter-btn px-5 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium transition-all hover:bg-white/20 whitespace-nowrap flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-state-DONE"></span>Completati</button>
+            <button onclick="setFilter('CANCELLED')" id="filter-CANCELLED" class="filter-btn px-5 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium transition-all hover:bg-white/20 whitespace-nowrap flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-state-CANCELLED"></span>Annullati</button>
+        </div>
+
+        <!-- Notification Area -->
+        <div id="notification-area" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
+
+        <!-- Task List Grid -->
+        <div id="loadingIndicator" class="flex justify-center items-center py-20 hidden">
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-purple-500"></i>
+        </div>
+        
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-gray-400 opacity-70">
+            <i class="fa-solid fa-box-open text-6xl mb-4"></i>
+            <p class="text-xl">Nessun task trovato.</p>
+            <p class="text-sm mt-2">Crea un nuovo task o cambia i filtri.</p>
+        </div>
+
+        <div id="taskGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
+            <!-- Cards will be dynamically inserted here -->
+        </div>
+
+    </main>
+
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Custom logic -->
+    <script src="app.js"></script>
+</body>
+</html>
