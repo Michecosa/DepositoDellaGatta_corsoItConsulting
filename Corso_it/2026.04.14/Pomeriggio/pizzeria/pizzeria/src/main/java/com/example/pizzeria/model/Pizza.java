@@ -26,5 +26,6 @@ public class Pizza {
     private Double prezzo;
 
     @ManyToMany(mappedBy = "pizze")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Ordine> ordini;
 }

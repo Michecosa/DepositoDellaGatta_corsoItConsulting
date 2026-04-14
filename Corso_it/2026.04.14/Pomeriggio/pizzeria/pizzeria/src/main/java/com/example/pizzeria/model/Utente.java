@@ -30,5 +30,6 @@ public class Utente {
     private Boolean admin = false;
 
     @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Ordine> ordini;
 }

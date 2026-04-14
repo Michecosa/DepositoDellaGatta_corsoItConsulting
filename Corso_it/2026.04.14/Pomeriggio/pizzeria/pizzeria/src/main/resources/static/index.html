@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Pizza Tavern</title>
+    <!-- Google Fonts: Press Start 2P -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'rpg-wood': '#4b3222',
+                        'rpg-parchment': '#f4ead5',
+                        'rpg-green': '#2d6a4f',
+                        'rpg-gold': '#ffb703',
+                        'rpg-border': '#1e1e1e'
+                    },
+                    fontFamily: {
+                        'pixel': ['"Press Start 2P"', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-rpg-green font-pixel text-rpg-border pb-12 min-h-screen relative">
+
+    <!-- Navbar -->
+    <nav class="p-4 bg-rpg-wood shadow-[0_4px_0_0_#1e1e1e] border-b-4 border-rpg-border flex flex-col md:flex-row justify-between items-center text-rpg-parchment gap-4 sticky top-0 z-50">
+        <div class="text-xl md:text-2xl flex items-center gap-2 drop-shadow-[2px_2px_0_#1e1e1e]">
+            🍕 Pixel Pizza Tavern
+        </div>
+        <div class="flex items-center gap-4 text-xs md:text-sm">
+            <label for="user-select" class="drop-shadow-[1px_1px_0_#1e1e1e]">Player:</label>
+            <select id="user-select" class="pixel-select bg-rpg-parchment text-rpg-border p-2 outline-none cursor-pointer">
+                <option value="">Seleziona Eroe...</option>
+                <!-- Users loaded here -->
+            </select>
+        </div>
+    </nav>
+
+    <!-- Welcome message when no user is selected -->
+    <div id="welcome-message" class="container mx-auto mt-20 px-4 text-center">
+        <div class="pixel-box bg-rpg-parchment inline-block p-8 mx-auto max-w-2xl transform rotate-1">
+            <h1 class="text-rpg-wood text-2xl lg:text-3xl mb-6 leading-relaxed">Benvenuto alla Taverna!</h1>
+            <p class="text-[10px] lg:text-[12px] leading-loose text-gray-800">
+                Seleziona il tuo personaggio dal menu in alto per iniziare il tuo viaggio e riempire il tuo inventario con le migliori pizze del reame.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto mt-8 px-4" id="main-content" style="display: none;">
+        
+        <!-- Tab Navigation -->
+        <div class="flex flex-wrap gap-4 mb-8 justify-center">
+            <button id="tab-shop" class="pixel-btn active">🗡️ Shop</button>
+            <button id="tab-quests" class="pixel-btn">📜 Quest Log</button>
+            <button id="tab-admin" class="pixel-btn hidden border-red-500">👑 Game Master</button>
+        </div>
+
+        <!-- Shop View -->
+        <div id="view-shop" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="col-span-1 lg:col-span-2">
+                
+                <h2 class="text-rpg-parchment text-xl mb-6 drop-shadow-[2px_2px_0_#1e1e1e]">🗡️ Equipaggiamento Primario (Pizze)</h2>
+                <div id="pizze-list" class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-12">
+                    <!-- Pizzas -->
+                </div>
+
+                <h2 class="text-rpg-parchment text-xl mb-6 drop-shadow-[2px_2px_0_#1e1e1e]">🧪 Consumabili (Extra)</h2>
+                <div id="extra-list" class="grid grid-cols-1 xl:grid-cols-2 gap-6 pb-8">
+                    <!-- Extras -->
+                </div>
+            </div>
+
+            <!-- Inventory (Cart) -->
+            <div class="pixel-box bg-rpg-parchment p-6 lg:sticky lg:top-28 h-fit">
+                <h2 class="text-lg text-center border-b-[4px] border-rpg-border pb-4 mb-6">🎒 Inventario</h2>
+                <ul id="cart-list" class="space-y-4 mb-6 text-[10px] leading-relaxed max-h-[40vh] overflow-y-auto pr-2">
+                    <!-- Cart items -->
+                    <li class="text-center text-gray-500 my-8 shadow-none border-none">Vuoto, serve oro!</li>
+                </ul>
+                <div class="border-t-[4px] border-rpg-border pt-6 mt-2">
+                    <div class="flex justify-between items-center mb-6 text-sm">
+                        <span>Totale:</span>
+                        <span class="text-rpg-gold font-bold drop-shadow-[1px_1px_0_#000] text-lg">💰 <span id="cart-total">0</span>G</span>
+                    </div>
+                    <button id="btn-checkout" class="pixel-btn w-full bg-rpg-gold text-rpg-border hover:bg-yellow-400 py-4 text-xs tracking-wider" disabled>
+                        Acquista
+                    </button>
+                    <p id="checkout-msg" class="text-[10px] text-center mt-4 hidden font-bold"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quest Log View (Orders for current user) -->
+        <div id="view-quests" class="hidden text-sm">
+            <h2 class="text-rpg-parchment text-xl lg:text-2xl mb-8 text-center drop-shadow-[2px_2px_0_#1e1e1e]">📜 Quest Log (I tuoi ordini)</h2>
+            <div id="quest-list" class="space-y-6 max-w-4xl mx-auto">
+                <!-- User Orders here -->
+            </div>
+        </div>
+
+        <!-- Game Master View (All orders) -->
+        <div id="view-admin" class="hidden text-sm">
+            <h2 class="text-red-400 text-xl lg:text-2xl mb-8 text-center drop-shadow-[2px_2px_0_#1e1e1e]">👑 GM Dashboard (Gestione Reame)</h2>
+            <div class="bg-rpg-parchment pixel-box overflow-x-auto max-w-5xl mx-auto">
+                <table class="w-full text-left border-collapse min-w-[700px]">
+                    <thead>
+                        <tr class="border-b-[4px] border-rpg-border bg-[#e1ceaa]">
+                            <th class="p-4">ID</th>
+                            <th class="p-4">Eroe</th>
+                            <th class="p-4">Equipaggiamento</th>
+                            <th class="p-4">Iniziata il</th>
+                            <th class="p-4">Stato Quest</th>
+                            <th class="p-4 text-center">Azione</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-orders-list" class="text-[10px] lg:text-xs">
+                        <!-- All orders here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script loading -->
+    <script src="app.js"></script>
+</body>
+</html>

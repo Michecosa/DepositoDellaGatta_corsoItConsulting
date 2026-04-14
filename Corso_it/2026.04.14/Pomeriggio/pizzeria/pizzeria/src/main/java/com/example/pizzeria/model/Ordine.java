@@ -1,7 +1,5 @@
 package com.example.pizzeria.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -30,7 +28,7 @@ public class Ordine {
 
     @ManyToOne
     @JoinColumn(name = "utente_id", nullable = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("ordini")
     private Utente utente;
 
     @ManyToMany

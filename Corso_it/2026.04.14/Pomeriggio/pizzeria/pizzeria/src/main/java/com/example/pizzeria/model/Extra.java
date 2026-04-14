@@ -25,6 +25,6 @@ public class Extra {
     private Double prezzo;
 
     @ManyToMany(mappedBy = "extra")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Ordine> ordini;
 }
