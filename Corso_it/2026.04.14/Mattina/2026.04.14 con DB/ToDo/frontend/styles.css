@@ -1,60 +1,119 @@
-/* Minimal Pro Styles */
+/* Minimal Glassmorphism Pro Styles */
 body {
-    background-color: #F9FAFB;
+    background-color: #F8FAFC;
     color: #1F2937;
     font-family: 'Inter', sans-serif;
+    position: relative;
+    /* Evita scroll orizzontali dei blob */
+    overflow-x: hidden;
+}
+
+/* Background Bolbs */
+.bg-blobs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.6;
+}
+
+.blob-1 {
+    width: 600px;
+    height: 600px;
+    background-color: #E0E7FF; /* pastello indaco */
+    top: -10%;
+    left: -10%;
+    animation: drift-1 20s infinite alternate ease-in-out;
+}
+
+.blob-2 {
+    width: 500px;
+    height: 500px;
+    background-color: #F3E8FF; /* pastello rosa */
+    bottom: -10%;
+    right: -10%;
+    animation: drift-2 25s infinite alternate-reverse ease-in-out;
+}
+
+@keyframes drift-1 {
+    0% { transform: translate(0px, 0px) scale(1); }
+    50% { transform: translate(100px, 150px) scale(1.1); }
+    100% { transform: translate(-50px, 80px) scale(0.9); }
+}
+
+@keyframes drift-2 {
+    0% { transform: translate(0px, 0px) scale(1); }
+    50% { transform: translate(-100px, -150px) scale(1.1); }
+    100% { transform: translate(50px, -50px) scale(0.9); }
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background: #E5E7EB;
-    border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #D1D5DB;
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+.custom-scrollbar::-webkit-scrollbar { height: 4px; }
 
-.custom-scrollbar::-webkit-scrollbar {
-    height: 4px;
-}
-
-/* Minimal Card and Hover */
+/* In app.js we apply classes to card, but we prepare hover effects */
 .task-card {
-    transition: all 0.2s ease-in-out;
-    background: #ffffff;
-    border: 1px solid #E5E7EB; /* gray-200 */
-}
-.task-card:hover {
-    border-color: #D1D5DB; /* gray-300 */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
-    transform: translateY(-1px);
+    /* Il resto è su Tailwind nella logica JS */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Notification animation */
+/* Fire Mode Glass Button */
+@keyframes fireGlassGlow {
+    0% { 
+        filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.3)) drop-shadow(0 0 3px rgba(245, 158, 11, 0.2)); 
+        background: rgba(255,255,255,0.4); 
+        border-color: rgba(255, 255, 255, 0.8); 
+    }
+    50% { 
+        filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.6)) drop-shadow(0 0 10px rgba(245, 158, 11, 0.5)); 
+        background: rgba(255,255,255,0.7); 
+        border-color: rgba(239, 68, 68, 0.4); 
+    }
+    100% { 
+        filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.3)) drop-shadow(0 0 3px rgba(245, 158, 11, 0.2)); 
+        background: rgba(255,255,255,0.4); 
+        border-color: rgba(255, 255, 255, 0.8); 
+    }
+}
+
+.btn-glass-fire {
+    animation: fireGlassGlow 2.5s infinite ease-in-out;
+    color: #DC2626; /* text-red-600 */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-width: 1px;
+    border-style: solid;
+}
+
+.btn-glass-fire:hover {
+    background: rgba(255,255,255,0.8);
+    transform: scale(1.02);
+}
+
+/* Animations per le Notification */
 @keyframes slideInRight {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
-
 @keyframes slideOutRight {
     from { transform: translateX(0); opacity: 1; }
     to { transform: translateX(100%); opacity: 0; }
 }
-
-.notification-enter {
-    animation: slideInRight 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.notification-exit {
-    animation: slideOutRight 0.3s forwards ease-in;
-}
+.notification-enter { animation: slideInRight 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.notification-exit { animation: slideOutRight 0.3s forwards ease-in; }
 
 /* Tab Active State */
 .tab-active {

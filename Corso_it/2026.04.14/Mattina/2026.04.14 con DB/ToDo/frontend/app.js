@@ -4,7 +4,7 @@ const API_URL = 'http://localhost:8080/todos';
 let tasks = [];
 let currentFilter = 'ALL';
 let searchQuery = '';
-let currentPriority = 1; // Default
+let currentPriority = 1;
 
 // DOM Elements
 const taskGrid = document.getElementById('taskGrid');
@@ -38,27 +38,28 @@ function setPriority(prio) {
     if (prio < 1 || prio > 3) return;
     currentPriority = prio;
     
+    const inactiveClass = "w-8 h-8 rounded-md flex items-center justify-center font-medium text-sm text-textMuted bg-white/40 hover:bg-white/60 border border-white/50 backdrop-blur-sm transition-all focus:outline-none";
+    const activeClass = "w-8 h-8 rounded-md flex items-center justify-center font-bold text-primary bg-white/80 border border-white/80 shadow-md backdrop-blur-md transition-all focus:outline-none scale-105";
+
     for (let i = 1; i <= 3; i++) {
         const btn = document.getElementById(`prio-${i}`);
-        if(btn) {
-            btn.className = "w-8 h-8 rounded-md flex items-center justify-center font-medium text-sm text-textMuted border border-borderLight bg-white hover:bg-gray-50 hover:text-textMain transition-colors focus:outline-none";
-        }
+        if(btn) btn.className = inactiveClass;
     }
     
     const activeBtn = document.getElementById(`prio-${prio}`);
-    if(activeBtn) {
-        activeBtn.className = "w-8 h-8 rounded-md flex items-center justify-center font-medium text-sm text-white bg-primary border border-primary shadow-sm transition-colors focus:outline-none";
-    }
+    if(activeBtn) activeBtn.className = activeClass;
+    
+    // Nessuna variazione dinamica al bottone Crea (rimane quello standard HTML)
 }
 
 function showNotification(message, type = 'success') {
     const container = document.getElementById('notification-area');
     const note = document.createElement('div');
     
-    const bgClass = 'bg-white border-borderLight text-textMain';
+    const bgClass = 'bg-white/70 backdrop-blur-md border-white/50 text-textMain';
     const iconClass = type === 'success' ? 'fa-check text-green-500' : 'fa-triangle-exclamation text-red-500';
     
-    note.className = `border px-4 py-3 rounded-lg shadow-md flex items-center gap-3 notification-enter ${bgClass}`;
+    note.className = `border px-4 py-3 rounded-lg shadow-lg shadow-gray-200/50 flex items-center gap-3 notification-enter ${bgClass}`;
     note.innerHTML = `
         <i class="fa-solid ${iconClass}"></i>
         <p class="text-sm font-medium pr-2">${message}</p>
@@ -197,34 +198,37 @@ function renderTasks() {
         const isCompletedOrCancelled = task.stato === 'DONE' || task.stato === 'CANCELLED';
         
         const card = document.createElement('div');
-        card.className = `task-card p-5 rounded-xl flex flex-col h-full relative group ${isCompletedOrCancelled ? 'opacity-60 bg-gray-50' : 'bg-white'}`;
+        // Glassmorphism base classes
+        const baseClasses = "task-card p-5 rounded-xl flex flex-col h-full relative group bg-white/50 backdrop-blur-lg border border-white/60 shadow-lg shadow-blue-500/5 hover:bg-white/70 hover:-translate-y-1";
+        
+        card.className = isCompletedOrCancelled ? `${baseClasses} opacity-60` : baseClasses;
         
         // Actions
         let actionButtonsHtml = '';
         
         if (task.stato === 'TODO') {
-            actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'IN_PROGRESS')" class="text-textMuted hover:text-primary transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-blue-50 flex items-center gap-1.5"><i class="fa-solid fa-play text-xs opacity-70"></i> Inizia</button>`;
+            actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'IN_PROGRESS')" class="text-textMuted hover:text-primary transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-white/60 backdrop-blur-sm flex items-center gap-1.5"><i class="fa-solid fa-play text-xs opacity-70"></i> Inizia</button>`;
         } else if (task.stato === 'IN_PROGRESS') {
-            actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'DONE')" class="text-textMuted hover:text-green-600 transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-green-50 flex items-center gap-1.5"><i class="fa-solid fa-check text-xs opacity-70"></i> Fatto</button>`;
+            actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'DONE')" class="text-textMuted hover:text-green-600 transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-white/60 backdrop-blur-sm flex items-center gap-1.5"><i class="fa-solid fa-check text-xs opacity-70"></i> Fatto</button>`;
         }
         
         if (task.stato === 'TODO' || task.stato === 'IN_PROGRESS') {
-             actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'CANCELLED')" class="text-textMuted hover:text-textMain transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-gray-100 flex items-center gap-1.5" title="Annulla"><i class="fa-solid fa-ban text-xs opacity-70"></i> Annulla</button>`;
+             actionButtonsHtml += `<button onclick="updateTaskStatus(${task.id}, 'CANCELLED')" class="text-textMuted hover:text-textMain transition-colors text-sm font-medium py-1 px-2 rounded hover:bg-white/60 backdrop-blur-sm flex items-center gap-1.5" title="Annulla"><i class="fa-solid fa-ban text-xs opacity-70"></i> Annulla</button>`;
         }
 
-        const deleteBtn = `<button onclick="deleteTask(${task.id})" class="text-textMuted hover:text-red-500 transition-colors py-1 px-2 rounded hover:bg-red-50" title="Elimina"><i class="fa-regular fa-trash-can opacity-80"></i></button>`;
+        const deleteBtn = `<button onclick="deleteTask(${task.id})" class="text-textMuted hover:text-red-500 transition-colors py-1 px-2 rounded hover:bg-white/60 backdrop-blur-sm" title="Elimina"><i class="fa-regular fa-trash-can opacity-80"></i></button>`;
         
         let bottomActions = '';
         if (actionButtonsHtml || isCompletedOrCancelled) {
              bottomActions = `
-                <div class="mt-4 pt-3 border-t border-borderLight flex justify-between items-center gap-2">
+                <div class="mt-4 pt-3 border-t border-white/50 flex justify-between items-center gap-2">
                     <div class="flex gap-0.5">${actionButtonsHtml}</div>
                     ${deleteBtn}
                 </div>
              `;
         } else {
              bottomActions = `
-                <div class="mt-4 pt-3 border-t border-borderLight flex justify-end items-center gap-2">
+                <div class="mt-4 pt-3 border-t border-white/50 flex justify-end items-center gap-2">
                     ${deleteBtn}
                 </div>
              `;
@@ -236,14 +240,14 @@ function renderTasks() {
             <div class="flex items-center gap-2 mb-3 text-textMuted">
                 <i class="${stateInfo.icon} text-sm"></i>
                 <span class="text-[11px] font-semibold uppercase tracking-wider">${stateInfo.label}</span>
-                <span class="text-xs ml-auto">#${task.id}</span>
+                <span class="text-xs ml-auto font-mono text-gray-400">#${task.id}</span>
             </div>
             
-            <h3 class="${strikeClass} text-base font-medium leading-snug flex-grow mb-4 break-words pl-1 border-l-2 border-transparent group-hover:border-primary transition-all">${task.descrizione}</h3>
+            <h3 class="${strikeClass} text-base font-medium leading-snug flex-grow mb-4 break-words pl-1 border-l-2 border-transparent group-hover:border-primary/50 transition-all">${task.descrizione}</h3>
             
             <div class="flex items-center gap-3">
-                <div class="flex items-center gap-1.5 text-textMuted text-xs font-medium bg-bglight px-2 py-1 rounded border border-borderLight w-fit">
-                    <i class="fa-solid fa-flag text-[10px] opacity-70"></i> Priorità ${task.priorita}
+                <div class="flex items-center gap-1.5 text-textMuted text-xs font-medium bg-white/40 backdrop-blur-sm px-2 py-1 rounded border border-white/60 shadow-sm w-fit">
+                    <i class="fa-solid fa-flag text-[10px] opacity-70"></i> Prio ${task.priorita}
                 </div>
             </div>
             
