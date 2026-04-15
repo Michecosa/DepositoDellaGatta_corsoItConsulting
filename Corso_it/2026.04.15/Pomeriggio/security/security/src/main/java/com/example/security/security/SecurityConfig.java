@@ -3,12 +3,14 @@ package com.example.security.security;
 import com.example.security.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -48,33 +50,23 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     return http
-        // Disabilita CSRF (dato che non usiamo cookie/sessione)
         .csrf(csrf -> csrf.disable())
-
-        // Imposta la gestione delle sessioni come stateless (non viene usata la
-        // sessione HTTP)
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-        // Configura il CORS (necessario per chiamate da frontend)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        
-        // Definisce le regole di accesso alle rotte
+        .authenticationProvider(authenticationProvider())
         .authorizeHttpRequests(auth -> auth
-            // Le rotte di login e pubbliche non richiedono autenticazione
             .requestMatchers("/auth/**", "/public/**").permitAll()
-
-            // Le rotte /admin/** richiedono il ruolo ADMIN
             .requestMatchers("/admin/**").hasRole("ADMIN")
-
-            // Tutte le altre richieste devono essere autenticate
             .anyRequest().authenticated())
-
-        // Aggiunge il filtro JWT prima del filtro standard di autenticazione
-        // username/password
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-
-        // Costruisce e restituisce la catena
         .build();
+  }
+
+  @Bean
+  public AuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+    provider.setPasswordEncoder(passwordEncoder);
+    return provider;
   }
 
   /**
@@ -83,8 +75,8 @@ public class SecurityConfig {
    * BCrypt).
    */
   @Bean
-  public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return new ProviderManager(authenticationProvider());
   }
 
   /**

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,28 +58,36 @@ public class AuthController {
    * autentica l'utente e restituisce un token JWT (AuthResponse).
    */
   @PostMapping("/login")
-  public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+  public ResponseEntity<?> login(@RequestBody AuthRequest request) {
 
-    // Autentica l'utente usando AuthenticationManager.
-    // Se le credenziali sono errate, Spring Security lancia un'eccezione 401
-    // automaticamente.
-    Authentication auth = authManager.authenticate(
-        new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+    try {
+      // Autentica l'utente usando AuthenticationManager.
+      // Se le credenziali sono errate, viene lanciata una AuthenticationException.
+      Authentication auth = authManager.authenticate(
+          new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-    // Recupera l'utente (UserDetails) per ottenere i ruoli e firmare correttamente
-    // il JWT.
-    // In alternativa puoi fare: UserDetails user = (UserDetails)
-    // auth.getPrincipal();
-    UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
-    String accessToken = jwtService.generateToken(user);
-    String refreshToken = UUID.randomUUID().toString();
+      // Recupera l'utente autenticato dal contesto
+      UserDetails user = (UserDetails) auth.getPrincipal();
+      
+      // Genera i token
+      String accessToken = jwtService.generateToken(user);
+      String refreshToken = UUID.randomUUID().toString();
 
-    // Salva il refresh token nel DB
-    Utente u = utenteRepository.findByUsername(user.getUsername()).get();
-    u.setRefreshToken(refreshToken);
-    utenteRepository.save(u);
+      // Salva il refresh token nel DB. 
+      // Usiamo una gestione sicura dell'Optional per evitare NoSuchElementException.
+      Utente u = utenteRepository.findByUsername(user.getUsername())
+          .orElseThrow(() -> new RuntimeException("Utente non trovato dopo autenticazione"));
+          
+      u.setRefreshToken(refreshToken);
+      utenteRepository.save(u);
 
-    return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
+      return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
+
+    } catch (AuthenticationException e) {
+      // In caso di credenziali errate o utente non trovato, restituiamo 401 invece di 403
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(Map.of("error", "Credenziali non valide", "message", e.getMessage()));
+    }
   }
 
   @PostMapping("/refresh")
