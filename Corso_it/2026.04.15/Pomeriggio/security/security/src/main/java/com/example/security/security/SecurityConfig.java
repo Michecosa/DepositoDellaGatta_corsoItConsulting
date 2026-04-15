@@ -8,8 +8,13 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.List;
 
 /**
  * Configura la sicurezza dell'applicazione:
@@ -18,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * - Configura l'AuthenticationManager con UserDetailsService personalizzato
  */
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
   private final JwtAuthFilter jwtFilter;
@@ -49,6 +55,9 @@ public class SecurityConfig {
         // sessione HTTP)
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+        // Configura il CORS (necessario per chiamate da frontend)
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        
         // Definisce le regole di accesso alle rotte
         .authorizeHttpRequests(auth -> auth
             // Le rotte di login e pubbliche non richiedono autenticazione
@@ -74,13 +83,21 @@ public class SecurityConfig {
    * BCrypt).
    */
   @Bean
-  public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-    AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+  public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+  }
 
-    authBuilder
-        .userDetailsService(userDetailsService)
-        .passwordEncoder(passwordEncoder);
-
-    return authBuilder.build();
+  /**
+   * Configurazione CORS per permettere chiamate da Postman o Frontend locali.
+   */
+  @Bean
+  public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowedOrigins(List.of("*")); // In produzione, specifica i domini reali
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    config.setAllowedHeaders(List.of("*"));
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
   }
 }
