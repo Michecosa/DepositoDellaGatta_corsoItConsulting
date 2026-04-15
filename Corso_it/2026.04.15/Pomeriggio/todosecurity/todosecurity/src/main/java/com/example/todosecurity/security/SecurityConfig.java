@@ -57,7 +57,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/auth/**", "/public/**").permitAll()
             .requestMatchers("/admin/**").hasRole("ADMIN")
-            .anyRequest().authenticated())
+            .anyRequest().authenticated()) // <- copre AUTOMATICAMENTE qualsiasi rotta non esplicitamente elencata sopra
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
   }
