@@ -3,7 +3,7 @@ package com.example.security.controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/todos")
+@RequestMapping("/public/todos")
 public class TodoController {
   @GetMapping
   public String test() {
