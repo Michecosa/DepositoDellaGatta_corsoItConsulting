@@ -22,4 +22,6 @@ public class Utente {
   private String username;
   private String password;
   private String ruolo; // es: "USER", "ADMIN"
+
+  private String refreshToken;
 }
