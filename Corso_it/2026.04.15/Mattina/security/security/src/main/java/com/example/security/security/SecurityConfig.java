@@ -7,6 +7,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.Arrays;
+import java.util.List;
 
 import com.example.security.service.CustomUserDetailsService;
 
@@ -36,6 +41,9 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
+        // Abilita CORS
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
         // Disabilita la protezione CSRF (da lasciare attiva in ambienti reali se usi
         // cookie)
         .csrf(csrf -> csrf.disable())
@@ -55,8 +63,24 @@ public class SecurityConfig {
             .anyRequest().authenticated())
 
         // Abilita il login con form standard fornito da Spring Security
-        .formLogin(form -> form.permitAll())
-        .logout(logout -> logout.permitAll());
+        .formLogin(form -> form
+            .permitAll()
+            // Successo: restituisce 200 OK invece di fare il redirect
+            .successHandler((request, response, authentication) -> {
+                response.setStatus(200);
+            })
+            // Fallimento: restituisce 401 Unauthorized invece di fare il redirect
+            .failureHandler((request, response, exception) -> {
+                response.setStatus(401);
+            })
+        )
+        .logout(logout -> logout
+            .permitAll()
+            // Logout Successo: restituisce 200 OK
+            .logoutSuccessHandler((request, response, authentication) -> {
+                response.setStatus(200);
+            })
+        );
 
     // Costruisce e restituisce la catena di filtri di sicurezza
     return http.build();
@@ -80,5 +104,19 @@ public class SecurityConfig {
 
     // Costruisce e restituisce l'AuthenticationManager configurato
     return authBuilder.build();
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    // In produzione, specifica gli origin esatti
+    configuration.setAllowedOriginPatterns(List.of("*"));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
+    configuration.setExposedHeaders(List.of("x-auth-token"));
+    configuration.setAllowCredentials(true);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
   }
 }
