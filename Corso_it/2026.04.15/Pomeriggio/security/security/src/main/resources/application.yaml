@@ -15,8 +15,8 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  
-  # Configurazione JWT (Proprietà Custom)
-  jwt:
-    secret: mysupersecretkey1234567890abcdef
-    expiration: 86400000 # 1 giorno in millisecondi
+
+# Configurazione JWT (Proprietà Custom)
+jwt:
+  secret: mysupersecretkey1234567890abcdef
+  expiration: 86400000 # 1 giorno in millisecondi
