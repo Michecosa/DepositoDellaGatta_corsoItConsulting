@@ -1,0 +1,1 @@
+print("Ciao! Questo messaggio arriva da dentro un container Docker 🐳")
